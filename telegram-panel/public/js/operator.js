@@ -2,6 +2,38 @@ let currentChatId = null;
 let currentChat = null;
 let ws;
 
+// --- Вспомогательные функции представления ---
+
+function initials(name) {
+  const parts = String(name || '?').trim().split(/\s+/).slice(0, 2);
+  return parts.map((p) => p[0] || '').join('').toUpperCase() || '?';
+}
+
+const AVATAR_COLORS = [
+  '#e5484d', '#e07b1a', '#0a9d58', '#2f5be0', '#8e4ec6',
+  '#d6409f', '#0f9b9b', '#c2410c', '#4f46e5', '#0d7490',
+];
+
+function avatarColor(key) {
+  let hash = 0;
+  const s = String(key);
+  for (let i = 0; i < s.length; i += 1) hash = (hash * 31 + s.charCodeAt(i)) >>> 0;
+  return AVATAR_COLORS[hash % AVATAR_COLORS.length];
+}
+
+function fmtTime(ts) {
+  const d = new Date(ts);
+  return d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+}
+
+function avatarEl(name, chatId) {
+  const el = document.createElement('span');
+  el.className = 'chat-avatar';
+  el.style.background = avatarColor(chatId || name);
+  el.textContent = initials(name);
+  return el;
+}
+
 async function loadMe() {
   const res = await fetch('/api/me');
   if (!res.ok) {
@@ -22,15 +54,21 @@ async function loadChats() {
   const list = document.getElementById('chatList');
   list.innerHTML = '';
   if (chats.length === 0) {
-    list.innerHTML = '<li class="list-group-item text-muted">Вам пока не назначили ни одного чата</li>';
+    list.innerHTML = '<li class="chat-list__empty">Вам пока не назначили ни одного чата</li>';
     return;
   }
   chats.forEach((chat) => {
     const li = document.createElement('li');
-    li.className = 'list-group-item list-group-item-action chat-item';
-    li.style.cursor = 'pointer';
-    li.textContent = chat.title;
+    li.className = 'chat-item';
     li.dataset.chatId = chat.chatId;
+    const body = document.createElement('span');
+    body.className = 'chat-item__body';
+    const title = document.createElement('span');
+    title.className = 'chat-item__title';
+    title.textContent = chat.title;
+    body.appendChild(title);
+    li.appendChild(avatarEl(chat.title, chat.chatId));
+    li.appendChild(body);
     li.addEventListener('click', () => openChat(chat));
     list.appendChild(li);
   });
@@ -42,7 +80,17 @@ async function openChat(chat) {
   document
     .querySelectorAll('.chat-item')
     .forEach((el) => el.classList.toggle('active', el.dataset.chatId === chat.chatId));
-  document.getElementById('chatHeader').textContent = chat.title;
+
+  const header = document.getElementById('chatHeader');
+  header.innerHTML = '';
+  const wrap = document.createElement('div');
+  wrap.className = 'chat-header__title';
+  wrap.appendChild(avatarEl(chat.title, chat.chatId));
+  const t = document.createElement('span');
+  t.textContent = chat.title;
+  wrap.appendChild(t);
+  header.appendChild(wrap);
+
   document.getElementById('composerForm').classList.toggle('d-none', !chat.canSend);
   await loadMessages();
 }
@@ -61,13 +109,22 @@ document.querySelectorAll('[data-tab]').forEach((btn) => {
 
 // --- Шаблоны ответов ---
 
+const tplDropdown = document.getElementById('tplDropdown');
+document.getElementById('tplToggle').addEventListener('click', (e) => {
+  e.stopPropagation();
+  tplDropdown.classList.toggle('open');
+});
+document.addEventListener('click', (e) => {
+  if (!tplDropdown.contains(e.target)) tplDropdown.classList.remove('open');
+});
+
 async function loadTemplates() {
   const res = await fetch('/api/templates');
   const templates = await res.json();
   const menu = document.getElementById('templatesMenu');
   menu.innerHTML = '';
   if (templates.length === 0) {
-    menu.innerHTML = '<li><span class="dropdown-item-text text-muted">Шаблонов пока нет</span></li>';
+    menu.innerHTML = '<li><span class="dropdown-item-text">Шаблонов пока нет</span></li>';
     return;
   }
   templates.forEach((t) => {
@@ -76,10 +133,12 @@ async function loadTemplates() {
     a.className = 'dropdown-item';
     a.href = '#';
     a.textContent = t.title;
+    a.title = t.text;
     a.addEventListener('click', (e) => {
       e.preventDefault();
       const input = document.getElementById('composerInput');
       input.value = input.value ? `${input.value} ${t.text}` : t.text;
+      tplDropdown.classList.remove('open');
       input.focus();
     });
     li.appendChild(a);
@@ -99,14 +158,21 @@ async function loadQueue() {
   const list = document.getElementById('queueList');
   list.innerHTML = '';
   if (queue.length === 0) {
-    list.innerHTML = '<div class="text-muted">Свободных чатов сейчас нет</div>';
+    list.innerHTML = '<div class="empty">Свободных чатов сейчас нет</div>';
     return;
   }
   queue.forEach((item) => {
     const row = document.createElement('div');
-    row.className = 'list-group-item d-flex justify-content-between align-items-center';
+    row.className = 'card';
+    const body = document.createElement('div');
+    body.className = 'card-body d-flex justify-content-between align-items-center';
+    const left = document.createElement('div');
+    left.className = 'd-flex align-items-center gap-2';
+    left.appendChild(avatarEl(item.displayName, item.chatId));
     const label = document.createElement('span');
+    label.className = 'fw-bold';
     label.textContent = item.displayName;
+    left.appendChild(label);
     const takeBtn = document.createElement('button');
     takeBtn.className = 'btn btn-sm btn-primary';
     takeBtn.textContent = 'Взять в работу';
@@ -123,8 +189,9 @@ async function loadQueue() {
       await loadChats();
       document.querySelector('[data-tab="chats"]').click();
     });
-    row.appendChild(label);
-    row.appendChild(takeBtn);
+    body.appendChild(left);
+    body.appendChild(takeBtn);
+    row.appendChild(body);
     list.appendChild(row);
   });
 }
@@ -135,23 +202,35 @@ async function loadMessages() {
   const messages = await res.json();
   const box = document.getElementById('messages');
   box.innerHTML = '';
+  if (messages.length === 0) {
+    box.innerHTML = '<div class="messages__empty"><div class="icon">📭</div>В этом чате пока нет сообщений.</div>';
+    return;
+  }
   messages.forEach(appendMessage);
   box.scrollTop = box.scrollHeight;
 }
 
 function appendMessage(m) {
   const box = document.getElementById('messages');
+  const emptyState = box.querySelector('.messages__empty');
+  if (emptyState) emptyState.remove();
+
   const wrap = document.createElement('div');
-  wrap.className = `d-flex mb-2 ${m.out ? 'justify-content-end' : 'justify-content-start'}`;
+  wrap.className = `msg ${m.out ? 'msg--out' : 'msg--in'}`;
   const bubble = document.createElement('div');
-  bubble.className = `p-2 rounded ${m.out ? 'bg-primary text-white' : 'bg-white border'}`;
-  bubble.style.maxWidth = '70%';
+  bubble.className = 'msg__bubble';
   const text = document.createElement('div');
+  text.className = 'msg__text';
   text.textContent = m.text;
-  bubble.appendChild(text);
+  const meta = document.createElement('div');
+  meta.className = 'msg__meta';
+  const time = document.createElement('span');
+  time.className = 'msg__time';
+  time.textContent = fmtTime(m.date);
+  meta.appendChild(time);
   if (currentChat && currentChat.canDelete) {
     const del = document.createElement('button');
-    del.className = 'btn btn-sm btn-link text-danger p-0 mt-1';
+    del.className = 'msg__del';
     del.textContent = 'Удалить';
     del.addEventListener('click', async () => {
       await fetch(`/api/chats/${encodeURIComponent(currentChatId)}/messages/${m.id}`, {
@@ -159,8 +238,10 @@ function appendMessage(m) {
       });
       wrap.remove();
     });
-    bubble.appendChild(del);
+    meta.appendChild(del);
   }
+  bubble.appendChild(text);
+  bubble.appendChild(meta);
   wrap.appendChild(bubble);
   box.appendChild(wrap);
 }

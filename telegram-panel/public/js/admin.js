@@ -2,6 +2,44 @@ let allChats = [];
 let currentChatId = null;
 let ws;
 
+// --- Вспомогательные функции представления ---
+
+function escapeHtml(s) {
+  const div = document.createElement('div');
+  div.textContent = s;
+  return div.innerHTML;
+}
+
+function initials(name) {
+  const parts = String(name || '?').trim().split(/\s+/).slice(0, 2);
+  return parts.map((p) => p[0] || '').join('').toUpperCase() || '?';
+}
+
+const AVATAR_COLORS = [
+  '#e5484d', '#e07b1a', '#0a9d58', '#2f5be0', '#8e4ec6',
+  '#d6409f', '#0f9b9b', '#c2410c', '#4f46e5', '#0d7490',
+];
+
+function avatarColor(key) {
+  let hash = 0;
+  const s = String(key);
+  for (let i = 0; i < s.length; i += 1) hash = (hash * 31 + s.charCodeAt(i)) >>> 0;
+  return AVATAR_COLORS[hash % AVATAR_COLORS.length];
+}
+
+function fmtTime(ts) {
+  const d = new Date(ts);
+  return d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+}
+
+function avatarEl(name, key) {
+  const el = document.createElement('span');
+  el.className = 'chat-avatar';
+  el.style.background = avatarColor(key || name);
+  el.textContent = initials(name);
+  return el;
+}
+
 async function loadMe() {
   const res = await fetch('/api/me');
   if (!res.ok) {
@@ -15,6 +53,8 @@ async function loadMe() {
   }
   document.getElementById('whoami').textContent = me.username;
 }
+
+// --- Вкладки ---
 
 const TABS = ['chats', 'operators', 'templates', 'queue', 'stats'];
 
@@ -37,12 +77,21 @@ async function loadChats() {
   allChats = await res.json();
   const list = document.getElementById('chatList');
   list.innerHTML = '';
+  if (allChats.length === 0) {
+    list.innerHTML = '<li class="chat-list__empty">Диалогов пока нет</li>';
+  }
   allChats.forEach((chat) => {
     const li = document.createElement('li');
-    li.className = 'list-group-item list-group-item-action chat-item';
-    li.style.cursor = 'pointer';
-    li.textContent = chat.title;
+    li.className = 'chat-item';
     li.dataset.chatId = chat.chatId;
+    const body = document.createElement('span');
+    body.className = 'chat-item__body';
+    const title = document.createElement('span');
+    title.className = 'chat-item__title';
+    title.textContent = chat.title;
+    body.appendChild(title);
+    li.appendChild(avatarEl(chat.title, chat.chatId));
+    li.appendChild(body);
     li.addEventListener('click', () => openChat(chat));
     list.appendChild(li);
   });
@@ -64,7 +113,14 @@ async function openChat(chat) {
   document
     .querySelectorAll('.chat-item')
     .forEach((el) => el.classList.toggle('active', el.dataset.chatId === chat.chatId));
-  document.getElementById('chatHeader').querySelector('span').textContent = chat.title;
+
+  const titleWrap = document.querySelector('#chatHeader .chat-header__title');
+  titleWrap.innerHTML = '';
+  titleWrap.appendChild(avatarEl(chat.title, chat.chatId));
+  const span = document.createElement('span');
+  span.textContent = chat.title;
+  titleWrap.appendChild(span);
+
   document.getElementById('deleteChatBtn').classList.remove('d-none');
   document.getElementById('composerForm').classList.remove('d-none');
   await loadMessages();
@@ -76,22 +132,34 @@ async function loadMessages() {
   const messages = await res.json();
   const box = document.getElementById('messages');
   box.innerHTML = '';
+  if (messages.length === 0) {
+    box.innerHTML = '<div class="messages__empty"><div class="icon">📭</div>В этом чате пока нет сообщений.</div>';
+    return;
+  }
   messages.forEach(appendMessage);
   box.scrollTop = box.scrollHeight;
 }
 
 function appendMessage(m) {
   const box = document.getElementById('messages');
+  const emptyState = box.querySelector('.messages__empty');
+  if (emptyState) emptyState.remove();
+
   const wrap = document.createElement('div');
-  wrap.className = `d-flex mb-2 ${m.out ? 'justify-content-end' : 'justify-content-start'}`;
+  wrap.className = `msg ${m.out ? 'msg--out' : 'msg--in'}`;
   const bubble = document.createElement('div');
-  bubble.className = `p-2 rounded ${m.out ? 'bg-primary text-white' : 'bg-white border'}`;
-  bubble.style.maxWidth = '70%';
+  bubble.className = 'msg__bubble';
   const text = document.createElement('div');
+  text.className = 'msg__text';
   text.textContent = m.text;
-  bubble.appendChild(text);
+  const meta = document.createElement('div');
+  meta.className = 'msg__meta';
+  const time = document.createElement('span');
+  time.className = 'msg__time';
+  time.textContent = fmtTime(m.date);
+  meta.appendChild(time);
   const del = document.createElement('button');
-  del.className = 'btn btn-sm btn-link text-danger p-0 mt-1';
+  del.className = 'msg__del';
   del.textContent = 'Удалить';
   del.addEventListener('click', async () => {
     await fetch(`/api/chats/${encodeURIComponent(currentChatId)}/messages/${m.id}`, {
@@ -99,7 +167,9 @@ function appendMessage(m) {
     });
     wrap.remove();
   });
-  bubble.appendChild(del);
+  meta.appendChild(del);
+  bubble.appendChild(text);
+  bubble.appendChild(meta);
   wrap.appendChild(bubble);
   box.appendChild(wrap);
 }
@@ -127,12 +197,53 @@ document.getElementById('deleteChatBtn').addEventListener('click', async () => {
   if (!confirm('Удалить историю этого чата в Telegram? Это действие необратимо.')) return;
   await fetch(`/api/admin/chats/${encodeURIComponent(currentChatId)}`, { method: 'DELETE' });
   currentChatId = null;
-  document.getElementById('messages').innerHTML = '';
-  document.getElementById('chatHeader').querySelector('span').textContent = 'Выберите чат слева';
+  document.getElementById('messages').innerHTML =
+    '<div class="messages__empty"><div class="icon">💬</div>Выберите чат в списке слева, чтобы просмотреть переписку.</div>';
+  document.querySelector('#chatHeader .chat-header__title').innerHTML = '<span>Выберите чат слева</span>';
   document.getElementById('deleteChatBtn').classList.add('d-none');
   document.getElementById('composerForm').classList.add('d-none');
   loadChats();
 });
+
+// --- Шаблоны: выпадающее меню в композере ---
+
+const tplDropdown = document.getElementById('tplDropdown');
+document.getElementById('tplToggle').addEventListener('click', (e) => {
+  e.stopPropagation();
+  tplDropdown.classList.toggle('open');
+});
+document.addEventListener('click', (e) => {
+  if (!tplDropdown.contains(e.target)) tplDropdown.classList.remove('open');
+});
+
+async function loadTemplatesMenu() {
+  const res = await fetch('/api/templates');
+  const templates = await res.json();
+  const menu = document.getElementById('templatesMenu');
+  if (!menu) return;
+  menu.innerHTML = '';
+  if (templates.length === 0) {
+    menu.innerHTML = '<li><span class="dropdown-item-text">Шаблонов пока нет</span></li>';
+    return;
+  }
+  templates.forEach((t) => {
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.className = 'dropdown-item';
+    a.href = '#';
+    a.textContent = t.title;
+    a.title = t.text;
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      const input = document.getElementById('composerInput');
+      input.value = input.value ? `${input.value} ${t.text}` : t.text;
+      tplDropdown.classList.remove('open');
+      input.focus();
+    });
+    li.appendChild(a);
+    menu.appendChild(li);
+  });
+}
 
 // --- Операторы ---
 
@@ -156,60 +267,72 @@ document.getElementById('newOperatorForm').addEventListener('submit', async (e) 
   loadOperators();
 });
 
-function escapeHtml(s) {
-  const div = document.createElement('div');
-  div.textContent = s;
-  return div.innerHTML;
-}
-
 async function loadOperators() {
   const res = await fetch('/api/admin/operators');
   const operators = await res.json();
   const container = document.getElementById('operatorsList');
   container.innerHTML = '';
+  if (operators.length === 0) {
+    container.innerHTML = '<div class="empty">Операторов пока нет — создайте первого слева.</div>';
+    return;
+  }
   operators.forEach((op) => {
     const card = document.createElement('div');
-    card.className = 'card mb-3';
+    card.className = 'card op-card';
     card.innerHTML = `
       <div class="card-body">
-        <div class="d-flex justify-content-between align-items-center">
-          <h6 class="mb-2">${escapeHtml(op.username)}</h6>
-          <button class="btn btn-sm btn-outline-danger delete-op">Удалить оператора</button>
+        <div class="op-card__head">
+          <div class="op-card__name"></div>
+          <button class="btn btn-sm btn-outline-danger delete-op">Удалить</button>
         </div>
-        <div class="assignment-list mb-2"></div>
-        <div class="d-flex gap-2 align-items-end assign-row flex-wrap">
-          <div>
-            <label class="form-label small mb-0">Чат</label>
+        <div class="assignment-list"></div>
+        <div class="assign-row">
+          <div class="grow">
+            <label class="form-label">Чат</label>
             <select class="form-select form-select-sm chat-select"></select>
           </div>
-          <div>
-            <label class="form-label small mb-0">Имя для оператора (алиас)</label>
+          <div class="grow">
+            <label class="form-label">Алиас для оператора</label>
             <input class="form-control form-control-sm alias-input" placeholder="напр. Клиент №1">
           </div>
-          <div class="form-check">
-            <input class="form-check-input can-send" type="checkbox" checked>
-            <label class="form-check-label small">Отправка</label>
-          </div>
-          <div class="form-check">
-            <input class="form-check-input can-delete" type="checkbox">
-            <label class="form-check-label small">Удаление</label>
-          </div>
+          <label class="form-check"><input class="form-check-input can-send" type="checkbox" checked><span class="form-check-label">Отправка</span></label>
+          <label class="form-check"><input class="form-check-input can-delete" type="checkbox"><span class="form-check-label">Удаление</span></label>
           <button class="btn btn-sm btn-primary assign-btn">Назначить</button>
         </div>
       </div>
     `;
+
+    const nameEl = card.querySelector('.op-card__name');
+    nameEl.appendChild(avatarEl(op.username, `op${op.id}`));
+    const nameText = document.createElement('span');
+    nameText.textContent = op.username;
+    nameEl.appendChild(nameText);
+
     const assignmentList = card.querySelector('.assignment-list');
     if (op.assignments.length === 0) {
-      assignmentList.innerHTML = '<div class="text-muted small">Пока нет назначенных чатов</div>';
+      assignmentList.innerHTML = '<div class="empty">Пока нет назначенных чатов</div>';
     }
     op.assignments.forEach((a) => {
       const row = document.createElement('div');
-      row.className = 'small d-flex justify-content-between border-bottom py-1';
-      row.innerHTML = `<span>${escapeHtml(a.displayName)} <span class="text-muted">(${
-        a.canSend ? 'отправка' : 'без отправки'
-      }${a.canDelete ? ', удаление' : ''})</span></span>`;
+      row.className = 'list-group-item d-flex justify-content-between align-items-center py-1';
+      const left = document.createElement('span');
+      left.className = 'd-flex align-items-center gap-2';
+      const alias = document.createElement('span');
+      alias.className = 'fw-bold';
+      alias.textContent = a.displayName;
+      left.appendChild(alias);
+      const perm = document.createElement('span');
+      perm.className = `pill ${a.canSend ? 'pill--on' : ''}`;
+      perm.textContent = a.canSend ? 'отправка' : 'только чтение';
+      left.appendChild(perm);
+      if (a.canDelete) {
+        const perm2 = document.createElement('span');
+        perm2.className = 'pill pill--on';
+        perm2.textContent = 'удаление';
+        left.appendChild(perm2);
+      }
       const revoke = document.createElement('button');
-      revoke.className = 'btn btn-sm btn-link text-danger p-0';
+      revoke.className = 'btn btn-link text-danger';
       revoke.textContent = 'Отозвать';
       revoke.addEventListener('click', async () => {
         await fetch(`/api/admin/operators/${op.id}/assignments/${encodeURIComponent(a.chatId)}`, {
@@ -217,6 +340,7 @@ async function loadOperators() {
         });
         loadOperators();
       });
+      row.appendChild(left);
       row.appendChild(revoke);
       assignmentList.appendChild(row);
     });
@@ -264,34 +388,7 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
   window.location.href = 'login.html';
 });
 
-// --- Шаблоны ответов ---
-
-async function loadTemplatesMenu() {
-  const res = await fetch('/api/templates');
-  const templates = await res.json();
-  const menu = document.getElementById('templatesMenu');
-  if (!menu) return;
-  menu.innerHTML = '';
-  if (templates.length === 0) {
-    menu.innerHTML = '<li><span class="dropdown-item-text text-muted">Шаблонов пока нет</span></li>';
-    return;
-  }
-  templates.forEach((t) => {
-    const li = document.createElement('li');
-    const a = document.createElement('a');
-    a.className = 'dropdown-item';
-    a.href = '#';
-    a.textContent = t.title;
-    a.addEventListener('click', (e) => {
-      e.preventDefault();
-      const input = document.getElementById('composerInput');
-      input.value = input.value ? `${input.value} ${t.text}` : t.text;
-      input.focus();
-    });
-    li.appendChild(a);
-    menu.appendChild(li);
-  });
-}
+// --- Шаблоны: библиотека (вкладка) ---
 
 document.getElementById('newTemplateForm').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -320,28 +417,34 @@ async function loadTemplatesList() {
   const container = document.getElementById('templatesList');
   container.innerHTML = '';
   if (templates.length === 0) {
-    container.innerHTML = '<div class="text-muted small">Пока нет шаблонов</div>';
+    container.innerHTML = '<div class="empty">Пока нет шаблонов</div>';
     return;
   }
   templates.forEach((t) => {
     const row = document.createElement('div');
     row.className = 'card mb-2';
-    row.innerHTML = `
-      <div class="card-body py-2">
-        <div class="d-flex justify-content-between align-items-start">
-          <div>
-            <div class="fw-bold">${escapeHtml(t.title)}</div>
-            <div class="small text-muted">${escapeHtml(t.text)}</div>
-          </div>
-          <button class="btn btn-sm btn-outline-danger del-tpl">Удалить</button>
-        </div>
-      </div>
-    `;
-    row.querySelector('.del-tpl').addEventListener('click', async () => {
+    const body = document.createElement('div');
+    body.className = 'card-body py-2 d-flex justify-content-between align-items-start gap-2';
+    const info = document.createElement('div');
+    const title = document.createElement('div');
+    title.className = 'fw-bold';
+    title.textContent = t.title;
+    const sub = document.createElement('div');
+    sub.className = 'small text-muted';
+    sub.textContent = t.text;
+    info.appendChild(title);
+    info.appendChild(sub);
+    const del = document.createElement('button');
+    del.className = 'btn btn-sm btn-outline-danger';
+    del.textContent = 'Удалить';
+    del.addEventListener('click', async () => {
       await fetch(`/api/admin/templates/${t.id}`, { method: 'DELETE' });
       loadTemplatesList();
       loadTemplatesMenu();
     });
+    body.appendChild(info);
+    body.appendChild(del);
+    row.appendChild(body);
     container.appendChild(row);
   });
 }
@@ -375,21 +478,31 @@ async function loadQueueAdmin() {
   const container = document.getElementById('queueAdminList');
   container.innerHTML = '';
   if (queue.length === 0) {
-    container.innerHTML = '<div class="text-muted small">Очередь пуста</div>';
+    container.innerHTML = '<div class="empty">Очередь пуста</div>';
     return;
   }
   queue.forEach((item) => {
     const row = document.createElement('div');
-    row.className = 'd-flex justify-content-between align-items-center border-bottom py-2';
-    row.innerHTML = `<span>${escapeHtml(item.displayName)}</span>`;
+    row.className = 'card mb-2';
+    const body = document.createElement('div');
+    body.className = 'card-body py-2 d-flex justify-content-between align-items-center';
+    const left = document.createElement('div');
+    left.className = 'd-flex align-items-center gap-2';
+    left.appendChild(avatarEl(item.displayName, item.chatId));
+    const label = document.createElement('span');
+    label.className = 'fw-bold';
+    label.textContent = item.displayName;
+    left.appendChild(label);
     const removeBtn = document.createElement('button');
     removeBtn.className = 'btn btn-sm btn-outline-danger';
-    removeBtn.textContent = 'Убрать из очереди';
+    removeBtn.textContent = 'Убрать';
     removeBtn.addEventListener('click', async () => {
       await fetch(`/api/admin/queue/${item.id}`, { method: 'DELETE' });
       loadQueueAdmin();
     });
-    row.appendChild(removeBtn);
+    body.appendChild(left);
+    body.appendChild(removeBtn);
+    row.appendChild(body);
     container.appendChild(row);
   });
 }
@@ -409,9 +522,9 @@ async function loadStats() {
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${escapeHtml(s.username)}</td>
-      <td>${s.messagesToday}</td>
-      <td>${s.messagesTotal}</td>
-      <td>${s.assignedChats}</td>
+      <td class="num">${s.messagesToday}</td>
+      <td class="num">${s.messagesTotal}</td>
+      <td class="num">${s.assignedChats}</td>
     `;
     body.appendChild(tr);
   });

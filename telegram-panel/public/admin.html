@@ -4,124 +4,155 @@
 <meta charset="UTF-8">
 <title>Админ-панель</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head>
-<body class="bg-light">
-<nav class="navbar navbar-dark bg-dark px-3">
-  <span class="navbar-brand">Админ-панель</span>
-  <div>
-    <span id="whoami" class="text-light me-3 small"></span>
-    <button id="logoutBtn" class="btn btn-sm btn-outline-light">Выйти</button>
-  </div>
-</nav>
-<ul class="nav nav-tabs px-3 pt-2 bg-white">
-  <li class="nav-item"><button class="nav-link active" data-tab="chats">Чаты</button></li>
-  <li class="nav-item"><button class="nav-link" data-tab="operators">Операторы</button></li>
-  <li class="nav-item"><button class="nav-link" data-tab="templates">Шаблоны</button></li>
-  <li class="nav-item"><button class="nav-link" data-tab="queue">Очередь</button></li>
-  <li class="nav-item"><button class="nav-link" data-tab="stats">Статистика</button></li>
-</ul>
-
-<div id="tab-chats" class="d-flex" style="height: calc(100vh - 100px);">
-  <aside class="border-end bg-white" style="width:280px; overflow-y:auto;">
-    <ul id="chatList" class="list-group list-group-flush"></ul>
-  </aside>
-  <main class="flex-grow-1 d-flex flex-column">
-    <div id="chatHeader" class="border-bottom p-3 fw-bold d-flex justify-content-between align-items-center">
-      <span>Выберите чат слева</span>
-      <button id="deleteChatBtn" class="btn btn-sm btn-outline-danger d-none">Удалить чат</button>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="topbar__brand">
+      <span class="topbar__logo">✈️</span>
+      <span>Админ-панель</span>
     </div>
-    <div id="messages" class="flex-grow-1 p-3" style="overflow-y:auto;"></div>
-    <form id="composerForm" class="border-top p-2 d-flex gap-2 d-none">
-      <div class="dropdown">
-        <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-          Шаблоны
-        </button>
-        <ul class="dropdown-menu" id="templatesMenu" style="max-height:300px; overflow-y:auto;"></ul>
+    <div class="topbar__right">
+      <span class="topbar__user"><span class="dot"></span><span id="whoami"></span></span>
+      <button id="logoutBtn" class="btn btn-sm btn-ghost">Выйти</button>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button class="tab active" data-tab="chats">💬 Чаты</button>
+    <button class="tab" data-tab="operators">👥 Операторы</button>
+    <button class="tab" data-tab="templates">🗒 Шаблоны</button>
+    <button class="tab" data-tab="queue">📥 Очередь</button>
+    <button class="tab" data-tab="stats">📊 Статистика</button>
+  </nav>
+
+  <div class="content">
+    <!-- Чаты -->
+    <section id="tab-chats" class="layout">
+      <aside class="sidebar">
+        <div class="sidebar__head">Все диалоги</div>
+        <ul id="chatList" class="chat-list"></ul>
+      </aside>
+      <main class="main">
+        <div id="chatHeader" class="chat-header">
+          <div class="chat-header__title"><span>Выберите чат слева</span></div>
+          <button id="deleteChatBtn" class="btn btn-sm btn-outline-danger d-none">Удалить чат</button>
+        </div>
+        <div id="messages" class="messages">
+          <div class="messages__empty"><div class="icon">💬</div>Выберите чат в списке слева, чтобы просмотреть переписку.</div>
+        </div>
+        <form id="composerForm" class="composer d-none">
+          <div class="dropdown" id="tplDropdown">
+            <button class="btn btn-ghost" type="button" id="tplToggle">🗒 Шаблоны</button>
+            <ul class="dropdown-menu" id="templatesMenu"></ul>
+          </div>
+          <input type="text" id="composerInput" class="form-control" placeholder="Напишите сообщение…" autocomplete="off">
+          <button class="btn btn-primary" type="submit">Отправить</button>
+        </form>
+      </main>
+    </section>
+
+    <!-- Операторы -->
+    <section id="tab-operators" class="panel d-none">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-body">
+            <h2 class="panel__title" style="font-size:16px;margin-bottom:14px;">Новый оператор</h2>
+            <form id="newOperatorForm">
+              <div class="mb-2">
+                <label class="form-label">Логин</label>
+                <input class="form-control" id="newOpUsername" placeholder="Логин работника" required>
+              </div>
+              <div class="mb-2">
+                <label class="form-label">Пароль</label>
+                <input class="form-control" id="newOpPassword" placeholder="Мин. 6 символов" required>
+              </div>
+              <button class="btn btn-primary btn-block">Создать оператора</button>
+              <div id="newOpError" class="login-error" style="margin-top:8px;"></div>
+            </form>
+          </div>
+        </div>
+        <div>
+          <h2 class="panel__title">Операторы и доступ к чатам</h2>
+          <div id="operatorsList"></div>
+        </div>
       </div>
-      <input type="text" id="composerInput" class="form-control" placeholder="Сообщение...">
-      <button class="btn btn-primary" type="submit">Отправить</button>
-    </form>
-  </main>
-</div>
+    </section>
 
-<div id="tab-operators" class="container-fluid py-4 d-none">
-  <div class="row">
-    <div class="col-md-4">
-      <h5>Новый оператор</h5>
-      <form id="newOperatorForm">
-        <input class="form-control mb-2" id="newOpUsername" placeholder="Логин" required>
-        <input class="form-control mb-2" id="newOpPassword" placeholder="Пароль (мин. 6 симв.)" required>
-        <button class="btn btn-primary btn-sm">Создать</button>
-        <div id="newOpError" class="text-danger small mt-2"></div>
-      </form>
-    </div>
-    <div class="col-md-8">
-      <h5>Операторы и доступ к чатам</h5>
-      <div id="operatorsList"></div>
-    </div>
-  </div>
-</div>
-
-<div id="tab-templates" class="container-fluid py-4 d-none">
-  <div class="row">
-    <div class="col-md-4">
-      <h5>Новый шаблон</h5>
-      <form id="newTemplateForm">
-        <input class="form-control mb-2" id="newTplTitle" placeholder="Название (для списка)" required>
-        <textarea class="form-control mb-2" id="newTplText" rows="4" placeholder="Текст сообщения" required></textarea>
-        <button class="btn btn-primary btn-sm">Создать</button>
-        <div id="newTplError" class="text-danger small mt-2"></div>
-      </form>
-    </div>
-    <div class="col-md-8">
-      <h5>Список шаблонов</h5>
-      <div id="templatesList"></div>
-    </div>
-  </div>
-</div>
-
-<div id="tab-queue" class="container-fluid py-4 d-none">
-  <div class="row">
-    <div class="col-md-5">
-      <h5>Отправить чат в очередь</h5>
-      <p class="text-muted small">Любой оператор сможет сам забрать этот чат себе в работу.</p>
-      <select class="form-select form-select-sm mb-2" id="queueChatSelect"></select>
-      <input class="form-control form-control-sm mb-2" id="queueAlias" placeholder="Имя для оператора (алиас)">
-      <div class="form-check">
-        <input class="form-check-input" type="checkbox" id="queueCanSend" checked>
-        <label class="form-check-label small">Отправка</label>
+    <!-- Шаблоны -->
+    <section id="tab-templates" class="panel d-none">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-body">
+            <h2 class="panel__title" style="font-size:16px;margin-bottom:14px;">Новый шаблон</h2>
+            <form id="newTemplateForm">
+              <div class="mb-2">
+                <label class="form-label">Название</label>
+                <input class="form-control" id="newTplTitle" placeholder="Например: Приветствие" required>
+              </div>
+              <div class="mb-2">
+                <label class="form-label">Текст сообщения</label>
+                <textarea class="form-control" id="newTplText" rows="4" placeholder="Текст, который вставит оператор" required></textarea>
+              </div>
+              <button class="btn btn-primary btn-block">Создать шаблон</button>
+              <div id="newTplError" class="login-error" style="margin-top:8px;"></div>
+            </form>
+          </div>
+        </div>
+        <div>
+          <h2 class="panel__title">Библиотека шаблонов</h2>
+          <div id="templatesList"></div>
+        </div>
       </div>
-      <div class="form-check mb-2">
-        <input class="form-check-input" type="checkbox" id="queueCanDelete">
-        <label class="form-check-label small">Удаление</label>
+    </section>
+
+    <!-- Очередь -->
+    <section id="tab-queue" class="panel d-none">
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-body">
+            <h2 class="panel__title" style="font-size:16px;margin-bottom:6px;">Отправить чат в очередь</h2>
+            <p class="text-muted small" style="margin-bottom:14px;">Любой оператор сможет сам взять этот чат в работу.</p>
+            <div class="mb-2">
+              <label class="form-label">Чат</label>
+              <select class="form-select" id="queueChatSelect"></select>
+            </div>
+            <div class="mb-2">
+              <label class="form-label">Имя для оператора (алиас)</label>
+              <input class="form-control" id="queueAlias" placeholder="Например: Клиент №1">
+            </div>
+            <div class="d-flex gap-2 mb-3" style="margin-top:6px;">
+              <label class="form-check"><input class="form-check-input" type="checkbox" id="queueCanSend" checked><span class="form-check-label">Отправка</span></label>
+              <label class="form-check"><input class="form-check-input" type="checkbox" id="queueCanDelete"><span class="form-check-label">Удаление</span></label>
+            </div>
+            <button class="btn btn-primary btn-block" id="pushQueueBtn">Добавить в очередь</button>
+          </div>
+        </div>
+        <div>
+          <h2 class="panel__title">Сейчас в очереди</h2>
+          <div id="queueAdminList"></div>
+        </div>
       </div>
-      <button class="btn btn-primary btn-sm" id="pushQueueBtn">В очередь</button>
-    </div>
-    <div class="col-md-7">
-      <h5>Сейчас в очереди</h5>
-      <div id="queueAdminList"></div>
-    </div>
+    </section>
+
+    <!-- Статистика -->
+    <section id="tab-stats" class="panel d-none">
+      <h2 class="panel__title">Статистика по операторам</h2>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Оператор</th>
+            <th>Сообщений сегодня</th>
+            <th>Сообщений всего</th>
+            <th>Назначено чатов</th>
+          </tr>
+        </thead>
+        <tbody id="statsBody"></tbody>
+      </table>
+    </section>
   </div>
 </div>
-
-<div id="tab-stats" class="container-fluid py-4 d-none">
-  <h5>Статистика по операторам</h5>
-  <table class="table table-sm bg-white">
-    <thead>
-      <tr>
-        <th>Оператор</th>
-        <th>Сообщений сегодня</th>
-        <th>Сообщений всего</th>
-        <th>Назначено чатов</th>
-      </tr>
-    </thead>
-    <tbody id="statsBody"></tbody>
-  </table>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="js/admin.js"></script>
 </body>
 </html>
