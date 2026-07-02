@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Админ-панель</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-light">
+<nav class="navbar navbar-dark bg-dark px-3">
+  <span class="navbar-brand">Админ-панель</span>
+  <div>
+    <span id="whoami" class="text-light me-3 small"></span>
+    <button id="logoutBtn" class="btn btn-sm btn-outline-light">Выйти</button>
+  </div>
+</nav>
+<ul class="nav nav-tabs px-3 pt-2 bg-white">
+  <li class="nav-item"><button class="nav-link active" data-tab="chats">Чаты</button></li>
+  <li class="nav-item"><button class="nav-link" data-tab="operators">Операторы</button></li>
+</ul>
+
+<div id="tab-chats" class="d-flex" style="height: calc(100vh - 100px);">
+  <aside class="border-end bg-white" style="width:280px; overflow-y:auto;">
+    <ul id="chatList" class="list-group list-group-flush"></ul>
+  </aside>
+  <main class="flex-grow-1 d-flex flex-column">
+    <div id="chatHeader" class="border-bottom p-3 fw-bold d-flex justify-content-between align-items-center">
+      <span>Выберите чат слева</span>
+      <button id="deleteChatBtn" class="btn btn-sm btn-outline-danger d-none">Удалить чат</button>
+    </div>
+    <div id="messages" class="flex-grow-1 p-3" style="overflow-y:auto;"></div>
+    <form id="composerForm" class="border-top p-2 d-flex gap-2 d-none">
+      <input type="text" id="composerInput" class="form-control" placeholder="Сообщение...">
+      <button class="btn btn-primary" type="submit">Отправить</button>
+    </form>
+  </main>
+</div>
+
+<div id="tab-operators" class="container-fluid py-4 d-none">
+  <div class="row">
+    <div class="col-md-4">
+      <h5>Новый оператор</h5>
+      <form id="newOperatorForm">
+        <input class="form-control mb-2" id="newOpUsername" placeholder="Логин" required>
+        <input class="form-control mb-2" id="newOpPassword" placeholder="Пароль (мин. 6 симв.)" required>
+        <button class="btn btn-primary btn-sm">Создать</button>
+        <div id="newOpError" class="text-danger small mt-2"></div>
+      </form>
+    </div>
+    <div class="col-md-8">
+      <h5>Операторы и доступ к чатам</h5>
+      <div id="operatorsList"></div>
+    </div>
+  </div>
+</div>
+
+<script src="js/admin.js"></script>
+</body>
+</html>

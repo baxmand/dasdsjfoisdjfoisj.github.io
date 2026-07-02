@@ -1,0 +1,12 @@
+.chat-item.active {
+  background-color: #e9ecef;
+  font-weight: 600;
+}
+
+#messages {
+  background: #f8f9fa;
+}
+
+.nav-tabs .nav-link {
+  cursor: pointer;
+}

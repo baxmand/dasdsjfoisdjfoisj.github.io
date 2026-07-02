@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Панель оператора</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-light">
+<nav class="navbar navbar-dark bg-dark px-3">
+  <span class="navbar-brand">Панель оператора</span>
+  <div>
+    <span id="whoami" class="text-light me-3 small"></span>
+    <button id="logoutBtn" class="btn btn-sm btn-outline-light">Выйти</button>
+  </div>
+</nav>
+<div class="d-flex" style="height: calc(100vh - 56px);">
+  <aside class="border-end bg-white" style="width:280px; overflow-y:auto;">
+    <ul id="chatList" class="list-group list-group-flush"></ul>
+  </aside>
+  <main class="flex-grow-1 d-flex flex-column">
+    <div id="chatHeader" class="border-bottom p-3 fw-bold">Выберите чат слева</div>
+    <div id="messages" class="flex-grow-1 p-3" style="overflow-y:auto;"></div>
+    <form id="composerForm" class="border-top p-2 d-flex gap-2 d-none">
+      <input type="text" id="composerInput" class="form-control" placeholder="Сообщение...">
+      <button class="btn btn-primary" type="submit">Отправить</button>
+    </form>
+  </main>
+</div>
+<script src="js/operator.js"></script>
+</body>
+</html>
