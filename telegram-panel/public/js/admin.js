@@ -16,13 +16,19 @@ async function loadMe() {
   document.getElementById('whoami').textContent = me.username;
 }
 
+const TABS = ['chats', 'operators', 'templates', 'queue', 'stats'];
+
 document.querySelectorAll('[data-tab]').forEach((btn) => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('[data-tab]').forEach((b) => b.classList.remove('active'));
     btn.classList.add('active');
-    document.getElementById('tab-chats').classList.toggle('d-none', btn.dataset.tab !== 'chats');
-    document.getElementById('tab-operators').classList.toggle('d-none', btn.dataset.tab !== 'operators');
+    TABS.forEach((tab) => {
+      document.getElementById(`tab-${tab}`).classList.toggle('d-none', btn.dataset.tab !== tab);
+    });
     if (btn.dataset.tab === 'operators') loadOperators();
+    if (btn.dataset.tab === 'templates') loadTemplatesList();
+    if (btn.dataset.tab === 'queue') loadQueueAdmin();
+    if (btn.dataset.tab === 'stats') loadStats();
   });
 });
 
@@ -40,6 +46,17 @@ async function loadChats() {
     li.addEventListener('click', () => openChat(chat));
     list.appendChild(li);
   });
+
+  const queueSelect = document.getElementById('queueChatSelect');
+  if (queueSelect) {
+    queueSelect.innerHTML = '';
+    allChats.forEach((chat) => {
+      const opt = document.createElement('option');
+      opt.value = chat.chatId;
+      opt.textContent = chat.title;
+      queueSelect.appendChild(opt);
+    });
+  }
 }
 
 async function openChat(chat) {
@@ -247,6 +264,159 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
   window.location.href = 'login.html';
 });
 
+// --- Шаблоны ответов ---
+
+async function loadTemplatesMenu() {
+  const res = await fetch('/api/templates');
+  const templates = await res.json();
+  const menu = document.getElementById('templatesMenu');
+  if (!menu) return;
+  menu.innerHTML = '';
+  if (templates.length === 0) {
+    menu.innerHTML = '<li><span class="dropdown-item-text text-muted">Шаблонов пока нет</span></li>';
+    return;
+  }
+  templates.forEach((t) => {
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.className = 'dropdown-item';
+    a.href = '#';
+    a.textContent = t.title;
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      const input = document.getElementById('composerInput');
+      input.value = input.value ? `${input.value} ${t.text}` : t.text;
+      input.focus();
+    });
+    li.appendChild(a);
+    menu.appendChild(li);
+  });
+}
+
+document.getElementById('newTemplateForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const title = document.getElementById('newTplTitle').value.trim();
+  const text = document.getElementById('newTplText').value.trim();
+  const errorEl = document.getElementById('newTplError');
+  errorEl.textContent = '';
+  const res = await fetch('/api/admin/templates', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ title, text }),
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    errorEl.textContent = data.error;
+    return;
+  }
+  document.getElementById('newTemplateForm').reset();
+  loadTemplatesList();
+  loadTemplatesMenu();
+});
+
+async function loadTemplatesList() {
+  const res = await fetch('/api/templates');
+  const templates = await res.json();
+  const container = document.getElementById('templatesList');
+  container.innerHTML = '';
+  if (templates.length === 0) {
+    container.innerHTML = '<div class="text-muted small">Пока нет шаблонов</div>';
+    return;
+  }
+  templates.forEach((t) => {
+    const row = document.createElement('div');
+    row.className = 'card mb-2';
+    row.innerHTML = `
+      <div class="card-body py-2">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <div class="fw-bold">${escapeHtml(t.title)}</div>
+            <div class="small text-muted">${escapeHtml(t.text)}</div>
+          </div>
+          <button class="btn btn-sm btn-outline-danger del-tpl">Удалить</button>
+        </div>
+      </div>
+    `;
+    row.querySelector('.del-tpl').addEventListener('click', async () => {
+      await fetch(`/api/admin/templates/${t.id}`, { method: 'DELETE' });
+      loadTemplatesList();
+      loadTemplatesMenu();
+    });
+    container.appendChild(row);
+  });
+}
+
+// --- Очередь свободных чатов ---
+
+document.getElementById('pushQueueBtn').addEventListener('click', async () => {
+  const chatId = document.getElementById('queueChatSelect').value;
+  const displayName = document.getElementById('queueAlias').value.trim();
+  if (!chatId || !displayName) {
+    alert('Выберите чат и укажите алиас');
+    return;
+  }
+  await fetch('/api/admin/queue', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chatId,
+      displayName,
+      canSend: document.getElementById('queueCanSend').checked,
+      canDelete: document.getElementById('queueCanDelete').checked,
+    }),
+  });
+  document.getElementById('queueAlias').value = '';
+  loadQueueAdmin();
+});
+
+async function loadQueueAdmin() {
+  const res = await fetch('/api/queue');
+  const queue = await res.json();
+  const container = document.getElementById('queueAdminList');
+  container.innerHTML = '';
+  if (queue.length === 0) {
+    container.innerHTML = '<div class="text-muted small">Очередь пуста</div>';
+    return;
+  }
+  queue.forEach((item) => {
+    const row = document.createElement('div');
+    row.className = 'd-flex justify-content-between align-items-center border-bottom py-2';
+    row.innerHTML = `<span>${escapeHtml(item.displayName)}</span>`;
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'btn btn-sm btn-outline-danger';
+    removeBtn.textContent = 'Убрать из очереди';
+    removeBtn.addEventListener('click', async () => {
+      await fetch(`/api/admin/queue/${item.id}`, { method: 'DELETE' });
+      loadQueueAdmin();
+    });
+    row.appendChild(removeBtn);
+    container.appendChild(row);
+  });
+}
+
+// --- Статистика ---
+
+async function loadStats() {
+  const res = await fetch('/api/admin/stats');
+  const stats = await res.json();
+  const body = document.getElementById('statsBody');
+  body.innerHTML = '';
+  if (stats.length === 0) {
+    body.innerHTML = '<tr><td colspan="4" class="text-muted">Операторов пока нет</td></tr>';
+    return;
+  }
+  stats.forEach((s) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${escapeHtml(s.username)}</td>
+      <td>${s.messagesToday}</td>
+      <td>${s.messagesTotal}</td>
+      <td>${s.assignedChats}</td>
+    `;
+    body.appendChild(tr);
+  });
+}
+
 function connectWs() {
   const proto = window.location.protocol === 'https:' ? 'wss' : 'ws';
   ws = new WebSocket(`${proto}://${window.location.host}/ws`);
@@ -256,6 +426,8 @@ function connectWs() {
       appendMessage(data.message);
       const box = document.getElementById('messages');
       box.scrollTop = box.scrollHeight;
+    } else if (data.type === 'queue:new' || data.type === 'queue:removed') {
+      if (!document.getElementById('tab-queue').classList.contains('d-none')) loadQueueAdmin();
     }
   };
   ws.onclose = () => setTimeout(connectWs, 3000);
@@ -264,5 +436,6 @@ function connectWs() {
 (async () => {
   await loadMe();
   await loadChats();
+  await loadTemplatesMenu();
   connectWs();
 })();

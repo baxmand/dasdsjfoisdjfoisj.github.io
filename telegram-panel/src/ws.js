@@ -15,8 +15,11 @@ function parseCookies(header) {
   return result;
 }
 
+let wssInstance = null;
+
 function attachWebsocket(server) {
   const wss = new WebSocketServer({ server, path: '/ws' });
+  wssInstance = wss;
   const tg = getTelegramService();
 
   wss.on('connection', (ws, req) => {
@@ -48,4 +51,14 @@ function attachWebsocket(server) {
   return wss;
 }
 
-module.exports = { attachWebsocket };
+// Рассылка событий очереди всем подключённым (и админу, и операторам),
+// чтобы список свободных чатов обновлялся в реальном времени у всех.
+function broadcastQueueEvent(event) {
+  if (!wssInstance) return;
+  wssInstance.clients.forEach((ws) => {
+    if (ws.readyState !== ws.OPEN || !ws.user) return;
+    ws.send(JSON.stringify(event));
+  });
+}
+
+module.exports = { attachWebsocket, broadcastQueueEvent };

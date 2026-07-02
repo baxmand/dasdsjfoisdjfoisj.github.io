@@ -7,9 +7,25 @@ const DB_PATH = path.join(__dirname, '..', 'data', 'db.json');
 
 function load() {
   if (!fs.existsSync(DB_PATH)) {
-    return { nextUserId: 1, nextAssignmentId: 1, users: [], assignments: [] };
+    return {
+      nextUserId: 1,
+      nextAssignmentId: 1,
+      nextTemplateId: 1,
+      nextQueueId: 1,
+      users: [],
+      assignments: [],
+      templates: [],
+      queue: [],
+      messageLog: [],
+    };
   }
-  return JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
+  const db = JSON.parse(fs.readFileSync(DB_PATH, 'utf8'));
+  db.templates = db.templates || [];
+  db.queue = db.queue || [];
+  db.messageLog = db.messageLog || [];
+  db.nextTemplateId = db.nextTemplateId || 1;
+  db.nextQueueId = db.nextQueueId || 1;
+  return db;
 }
 
 function save(db) {
@@ -108,6 +124,118 @@ function removeAssignment(userId, chatId) {
   save(db);
 }
 
+// --- Шаблоны ответов ---
+
+function listTemplates() {
+  return load().templates;
+}
+
+function createTemplate(title, text) {
+  const db = load();
+  const t = { id: db.nextTemplateId++, title, text, createdAt: new Date().toISOString() };
+  db.templates.push(t);
+  save(db);
+  return t;
+}
+
+function updateTemplate(id, { title, text }) {
+  const db = load();
+  const t = db.templates.find((x) => x.id === id);
+  if (!t) throw new Error('Шаблон не найден');
+  if (title !== undefined) t.title = title;
+  if (text !== undefined) t.text = text;
+  save(db);
+  return t;
+}
+
+function deleteTemplate(id) {
+  const db = load();
+  db.templates = db.templates.filter((t) => t.id !== id);
+  save(db);
+}
+
+// --- Очередь чатов (свободные чаты, которые операторы могут взять себе) ---
+
+function listQueue() {
+  return load().queue;
+}
+
+function addToQueue({ chatId, displayName, canSend, canDelete }) {
+  const db = load();
+  const item = {
+    id: db.nextQueueId++,
+    chatId: String(chatId),
+    displayName,
+    canSend,
+    canDelete,
+    createdAt: new Date().toISOString(),
+  };
+  db.queue.push(item);
+  save(db);
+  return item;
+}
+
+function removeFromQueue(id) {
+  const db = load();
+  db.queue = db.queue.filter((q) => q.id !== id);
+  save(db);
+}
+
+// Синхронная функция (без await внутри) — безопасна от гонки между
+// несколькими операторами, пытающимися забрать один и тот же чат одновременно.
+function claimQueueItem(id, userId) {
+  const db = load();
+  const idx = db.queue.findIndex((q) => q.id === id);
+  if (idx === -1) return null;
+  const [item] = db.queue.splice(idx, 1);
+  let assignment = db.assignments.find((a) => a.userId === userId && a.chatId === item.chatId);
+  if (assignment) {
+    assignment.displayName = item.displayName;
+    assignment.canSend = item.canSend;
+    assignment.canDelete = item.canDelete;
+  } else {
+    assignment = {
+      id: db.nextAssignmentId++,
+      userId,
+      chatId: item.chatId,
+      displayName: item.displayName,
+      canSend: item.canSend,
+      canDelete: item.canDelete,
+      createdAt: new Date().toISOString(),
+    };
+    db.assignments.push(assignment);
+  }
+  save(db);
+  return assignment;
+}
+
+// --- Статистика по операторам ---
+
+function logSentMessage(userId, chatId) {
+  const db = load();
+  db.messageLog.push({ userId, chatId: String(chatId), date: Date.now() });
+  if (db.messageLog.length > 5000) db.messageLog = db.messageLog.slice(-5000);
+  save(db);
+}
+
+function getOperatorStats() {
+  const db = load();
+  const dayMs = 24 * 60 * 60 * 1000;
+  const now = Date.now();
+  return db.users
+    .filter((u) => u.role === 'operator')
+    .map((u) => {
+      const logs = db.messageLog.filter((l) => l.userId === u.id);
+      return {
+        id: u.id,
+        username: u.username,
+        messagesTotal: logs.length,
+        messagesToday: logs.filter((l) => now - l.date < dayMs).length,
+        assignedChats: db.assignments.filter((a) => a.userId === u.id).length,
+      };
+    });
+}
+
 module.exports = {
   init,
   getUserByUsername,
@@ -119,4 +247,14 @@ module.exports = {
   getAssignment,
   upsertAssignment,
   removeAssignment,
+  listTemplates,
+  createTemplate,
+  updateTemplate,
+  deleteTemplate,
+  listQueue,
+  addToQueue,
+  removeFromQueue,
+  claimQueueItem,
+  logSentMessage,
+  getOperatorStats,
 };

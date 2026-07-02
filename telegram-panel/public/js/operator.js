@@ -47,6 +47,88 @@ async function openChat(chat) {
   await loadMessages();
 }
 
+// --- Вкладки ---
+
+document.querySelectorAll('[data-tab]').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-tab]').forEach((b) => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-chats').classList.toggle('d-none', btn.dataset.tab !== 'chats');
+    document.getElementById('tab-queue').classList.toggle('d-none', btn.dataset.tab !== 'queue');
+    if (btn.dataset.tab === 'queue') loadQueue();
+  });
+});
+
+// --- Шаблоны ответов ---
+
+async function loadTemplates() {
+  const res = await fetch('/api/templates');
+  const templates = await res.json();
+  const menu = document.getElementById('templatesMenu');
+  menu.innerHTML = '';
+  if (templates.length === 0) {
+    menu.innerHTML = '<li><span class="dropdown-item-text text-muted">Шаблонов пока нет</span></li>';
+    return;
+  }
+  templates.forEach((t) => {
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.className = 'dropdown-item';
+    a.href = '#';
+    a.textContent = t.title;
+    a.addEventListener('click', (e) => {
+      e.preventDefault();
+      const input = document.getElementById('composerInput');
+      input.value = input.value ? `${input.value} ${t.text}` : t.text;
+      input.focus();
+    });
+    li.appendChild(a);
+    menu.appendChild(li);
+  });
+}
+
+// --- Очередь свободных чатов ---
+
+async function loadQueue() {
+  const res = await fetch('/api/queue');
+  const queue = await res.json();
+  const badge = document.getElementById('queueBadge');
+  badge.textContent = String(queue.length);
+  badge.classList.toggle('d-none', queue.length === 0);
+
+  const list = document.getElementById('queueList');
+  list.innerHTML = '';
+  if (queue.length === 0) {
+    list.innerHTML = '<div class="text-muted">Свободных чатов сейчас нет</div>';
+    return;
+  }
+  queue.forEach((item) => {
+    const row = document.createElement('div');
+    row.className = 'list-group-item d-flex justify-content-between align-items-center';
+    const label = document.createElement('span');
+    label.textContent = item.displayName;
+    const takeBtn = document.createElement('button');
+    takeBtn.className = 'btn btn-sm btn-primary';
+    takeBtn.textContent = 'Взять в работу';
+    takeBtn.addEventListener('click', async () => {
+      takeBtn.disabled = true;
+      const claimRes = await fetch(`/api/queue/${item.id}/claim`, { method: 'POST' });
+      if (!claimRes.ok) {
+        const data = await claimRes.json();
+        alert(data.error || 'Не удалось забрать чат');
+        takeBtn.disabled = false;
+        return;
+      }
+      await loadQueue();
+      await loadChats();
+      document.querySelector('[data-tab="chats"]').click();
+    });
+    row.appendChild(label);
+    row.appendChild(takeBtn);
+    list.appendChild(row);
+  });
+}
+
 async function loadMessages() {
   if (!currentChatId) return;
   const res = await fetch(`/api/chats/${encodeURIComponent(currentChatId)}/messages`);
@@ -115,6 +197,8 @@ function connectWs() {
       appendMessage(data.message);
       const box = document.getElementById('messages');
       box.scrollTop = box.scrollHeight;
+    } else if (data.type === 'queue:new' || data.type === 'queue:removed') {
+      loadQueue();
     }
   };
   ws.onclose = () => setTimeout(connectWs, 3000);
@@ -123,5 +207,7 @@ function connectWs() {
 (async () => {
   await loadMe();
   await loadChats();
+  await loadTemplates();
+  await loadQueue();
   connectWs();
 })();

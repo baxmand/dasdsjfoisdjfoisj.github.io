@@ -51,6 +51,7 @@ router.post('/:chatId/messages', express.json(), async (req, res) => {
   if (!text) return res.status(400).json({ error: 'Пустое сообщение' });
   const tg = getTelegramService();
   const msg = await tg.sendMessage(req.params.chatId, text);
+  store.logSentMessage(req.user.id, req.params.chatId);
   res.json({ id: msg.id, date: msg.date, text: msg.text, out: msg.out });
 });
 

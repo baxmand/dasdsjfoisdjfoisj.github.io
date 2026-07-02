@@ -8,6 +8,7 @@ const store = require('./store');
 const authRoutes = require('./routes/authRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const sharedRoutes = require('./routes/sharedRoutes');
 const { getTelegramService } = require('./telegramService');
 const { attachWebsocket } = require('./ws');
 
@@ -20,6 +21,7 @@ async function main() {
   app.use(express.static(path.join(__dirname, '..', 'public')));
 
   app.use('/api', authRoutes);
+  app.use('/api', sharedRoutes);
   app.use('/api/chats', chatRoutes);
   app.use('/api/admin', adminRoutes);
 
