@@ -2,7 +2,7 @@ let currentChatId = null;
 let currentChat = null;
 let ws;
 
-// --- Вспомогательные функции представления ---
+// --- Представление ---
 
 function initials(name) {
   const parts = String(name || '?').trim().split(/\s+/).slice(0, 2);
@@ -10,8 +10,8 @@ function initials(name) {
 }
 
 const AVATAR_COLORS = [
-  '#e5484d', '#e07b1a', '#0a9d58', '#2f5be0', '#8e4ec6',
-  '#d6409f', '#0f9b9b', '#c2410c', '#4f46e5', '#0d7490',
+  '#e17076', '#e07b1a', '#4fad2d', '#3390ec', '#8e5db8',
+  '#d84f9e', '#0f9b9b', '#c2410c', '#5a53d6', '#0d7490',
 ];
 
 function avatarColor(key) {
@@ -22,14 +22,13 @@ function avatarColor(key) {
 }
 
 function fmtTime(ts) {
-  const d = new Date(ts);
-  return d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+  return new Date(ts).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
 }
 
-function avatarEl(name, chatId) {
+function avatarEl(name, key) {
   const el = document.createElement('span');
   el.className = 'chat-avatar';
-  el.style.background = avatarColor(chatId || name);
+  el.style.background = avatarColor(key || name);
   el.textContent = initials(name);
   return el;
 }
@@ -46,6 +45,7 @@ async function loadMe() {
     return;
   }
   document.getElementById('whoami').textContent = me.username;
+  document.getElementById('drawerAvatar').textContent = initials(me.username);
 }
 
 async function loadChats() {
@@ -61,6 +61,7 @@ async function loadChats() {
     const li = document.createElement('li');
     li.className = 'chat-item';
     li.dataset.chatId = chat.chatId;
+    li.dataset.title = chat.title.toLowerCase();
     const body = document.createElement('span');
     body.className = 'chat-item__body';
     const title = document.createElement('span');
@@ -95,17 +96,38 @@ async function openChat(chat) {
   await loadMessages();
 }
 
-// --- Вкладки ---
+// --- Папки: Все чаты / Очередь ---
 
-document.querySelectorAll('[data-tab]').forEach((btn) => {
+document.querySelectorAll('.tg-folder').forEach((btn) => {
   btn.addEventListener('click', () => {
-    document.querySelectorAll('[data-tab]').forEach((b) => b.classList.remove('active'));
+    document.querySelectorAll('.tg-folder').forEach((b) => b.classList.remove('active'));
     btn.classList.add('active');
-    document.getElementById('tab-chats').classList.toggle('d-none', btn.dataset.tab !== 'chats');
-    document.getElementById('tab-queue').classList.toggle('d-none', btn.dataset.tab !== 'queue');
-    if (btn.dataset.tab === 'queue') loadQueue();
+    const isQueue = btn.dataset.tab === 'queue';
+    document.getElementById('chatList').classList.toggle('d-none', isQueue);
+    document.getElementById('queueList').classList.toggle('d-none', !isQueue);
+    if (isQueue) loadQueue();
   });
 });
+
+// --- Поиск по чатам ---
+
+document.getElementById('chatSearch').addEventListener('input', (e) => {
+  const q = e.target.value.trim().toLowerCase();
+  document.querySelectorAll('#chatList .chat-item').forEach((el) => {
+    el.style.display = !q || (el.dataset.title || '').includes(q) ? '' : 'none';
+  });
+});
+
+// --- Меню (☰) ---
+
+const drawer = document.getElementById('drawer');
+const backdrop = document.getElementById('drawerBackdrop');
+function toggleDrawer(show) {
+  drawer.classList.toggle('d-none', !show);
+  backdrop.classList.toggle('d-none', !show);
+}
+document.getElementById('menuBtn').addEventListener('click', () => toggleDrawer(true));
+backdrop.addEventListener('click', () => toggleDrawer(false));
 
 // --- Шаблоны ответов ---
 
@@ -158,24 +180,27 @@ async function loadQueue() {
   const list = document.getElementById('queueList');
   list.innerHTML = '';
   if (queue.length === 0) {
-    list.innerHTML = '<div class="empty">Свободных чатов сейчас нет</div>';
+    list.innerHTML = '<div class="chat-list__empty">Свободных чатов сейчас нет</div>';
     return;
   }
   queue.forEach((item) => {
     const row = document.createElement('div');
-    row.className = 'card';
-    const body = document.createElement('div');
-    body.className = 'card-body d-flex justify-content-between align-items-center';
-    const left = document.createElement('div');
-    left.className = 'd-flex align-items-center gap-2';
-    left.appendChild(avatarEl(item.displayName, item.chatId));
-    const label = document.createElement('span');
-    label.className = 'fw-bold';
-    label.textContent = item.displayName;
-    left.appendChild(label);
+    row.className = 'queue-item';
+    row.appendChild(avatarEl(item.displayName, item.chatId));
+    const body = document.createElement('span');
+    body.className = 'chat-item__body';
+    const title = document.createElement('span');
+    title.className = 'chat-item__title';
+    title.textContent = item.displayName;
+    const sub = document.createElement('span');
+    sub.className = 'chat-item__sub';
+    sub.textContent = 'Нажмите, чтобы взять в работу';
+    body.appendChild(title);
+    body.appendChild(sub);
+    row.appendChild(body);
     const takeBtn = document.createElement('button');
     takeBtn.className = 'btn btn-sm btn-primary';
-    takeBtn.textContent = 'Взять в работу';
+    takeBtn.textContent = 'Взять';
     takeBtn.addEventListener('click', async () => {
       takeBtn.disabled = true;
       const claimRes = await fetch(`/api/queue/${item.id}/claim`, { method: 'POST' });
@@ -187,11 +212,9 @@ async function loadQueue() {
       }
       await loadQueue();
       await loadChats();
-      document.querySelector('[data-tab="chats"]').click();
+      document.querySelector('.tg-folder[data-tab="chats"]').click();
     });
-    body.appendChild(left);
-    body.appendChild(takeBtn);
-    row.appendChild(body);
+    row.appendChild(takeBtn);
     list.appendChild(row);
   });
 }
@@ -203,7 +226,7 @@ async function loadMessages() {
   const box = document.getElementById('messages');
   box.innerHTML = '';
   if (messages.length === 0) {
-    box.innerHTML = '<div class="messages__empty"><div class="icon">📭</div>В этом чате пока нет сообщений.</div>';
+    box.innerHTML = '<div class="messages__empty"><div class="icon">&#128235;</div>В этом чате пока нет сообщений.</div>';
     return;
   }
   messages.forEach(appendMessage);

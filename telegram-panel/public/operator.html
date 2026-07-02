@@ -2,57 +2,59 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Панель оператора</title>
+<title>Telegram</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="app">
-  <header class="topbar">
-    <div class="topbar__brand">
-      <span class="topbar__logo">✈️</span>
-      <span>Панель оператора</span>
+<div class="tg">
+  <aside class="tg-left">
+    <div class="tg-left__head">
+      <button class="icon-btn" id="menuBtn" aria-label="Меню">&#9776;</button>
+      <div class="tg-search">
+        <span class="tg-search__icon">&#128269;</span>
+        <input type="text" id="chatSearch" placeholder="Поиск" autocomplete="off">
+      </div>
     </div>
-    <div class="topbar__right">
-      <span class="topbar__user"><span class="dot"></span><span id="whoami"></span></span>
-      <button id="logoutBtn" class="btn btn-sm btn-ghost">Выйти</button>
+    <nav class="tg-folders">
+      <button class="tg-folder active" data-tab="chats">Все чаты</button>
+      <button class="tg-folder" data-tab="queue">Очередь <span id="queueBadge" class="badge d-none">0</span></button>
+    </nav>
+    <div class="tg-lists">
+      <ul id="chatList" class="chat-list"></ul>
+      <div id="queueList" class="d-none"></div>
     </div>
-  </header>
+  </aside>
 
-  <nav class="tabs">
-    <button class="tab active" data-tab="chats">💬 Мои чаты</button>
-    <button class="tab" data-tab="queue">📥 Очередь <span id="queueBadge" class="badge d-none">0</span></button>
-  </nav>
-
-  <div class="content">
-    <section id="tab-chats" class="layout">
-      <aside class="sidebar">
-        <div class="sidebar__head">Чаты</div>
-        <ul id="chatList" class="chat-list"></ul>
-      </aside>
-      <main class="main">
-        <div id="chatHeader" class="chat-header">Выберите чат слева</div>
-        <div id="messages" class="messages">
-          <div class="messages__empty"><div class="icon">💬</div>Выберите чат в списке слева, чтобы начать переписку.</div>
-        </div>
-        <form id="composerForm" class="composer d-none">
-          <div class="dropdown" id="tplDropdown">
-            <button class="btn btn-ghost" type="button" id="tplToggle">🗒 Шаблоны</button>
-            <ul class="dropdown-menu" id="templatesMenu"></ul>
-          </div>
-          <input type="text" id="composerInput" class="form-control" placeholder="Напишите сообщение…" autocomplete="off">
-          <button class="btn btn-primary" type="submit">Отправить</button>
-        </form>
-      </main>
-    </section>
-
-    <section id="tab-queue" class="panel d-none">
-      <h2 class="panel__title">Свободные чаты</h2>
-      <p class="text-muted small" style="margin-bottom:16px;">Возьмите чат в работу — он появится в разделе «Мои чаты».</p>
-      <div id="queueList" style="max-width:560px; display:flex; flex-direction:column; gap:10px;"></div>
-    </section>
-  </div>
+  <main class="tg-main">
+    <div id="chatHeader" class="tg-chat-header"><span class="placeholder">Выберите чат</span></div>
+    <div id="messages" class="messages">
+      <div class="messages__empty"><div class="icon">&#128172;</div>Выберите чат, чтобы начать переписку.</div>
+    </div>
+    <form id="composerForm" class="composer d-none">
+      <div class="dropdown" id="tplDropdown">
+        <button class="icon-btn" type="button" id="tplToggle" title="Шаблоны">&#128196;</button>
+        <ul class="dropdown-menu" id="templatesMenu"></ul>
+      </div>
+      <input type="text" id="composerInput" class="form-control" placeholder="Написать сообщение…" autocomplete="off">
+      <button class="btn btn-primary" type="submit" title="Отправить">&#10148;</button>
+    </form>
+  </main>
 </div>
+
+<!-- Боковое меню -->
+<div class="drawer-backdrop d-none" id="drawerBackdrop"></div>
+<aside class="drawer d-none" id="drawer">
+  <div class="drawer__head">
+    <div class="drawer__avatar" id="drawerAvatar">?</div>
+    <div class="drawer__name" id="whoami"></div>
+    <div class="drawer__role">В сети</div>
+  </div>
+  <div class="drawer__menu">
+    <button class="drawer__item" id="logoutBtn"><span class="ic">&#8617;</span> Выйти</button>
+  </div>
+</aside>
+
 <script src="js/operator.js"></script>
 </body>
 </html>

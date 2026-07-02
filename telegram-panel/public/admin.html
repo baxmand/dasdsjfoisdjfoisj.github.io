@@ -2,63 +2,81 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Админ-панель</title>
+<title>Telegram</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="app">
-  <header class="topbar">
-    <div class="topbar__brand">
-      <span class="topbar__logo">✈️</span>
-      <span>Админ-панель</span>
+<div class="tg">
+  <aside class="tg-left">
+    <div class="tg-left__head">
+      <button class="icon-btn" id="menuBtn" aria-label="Меню">&#9776;</button>
+      <div class="tg-search">
+        <span class="tg-search__icon">&#128269;</span>
+        <input type="text" id="chatSearch" placeholder="Поиск" autocomplete="off">
+      </div>
     </div>
-    <div class="topbar__right">
-      <span class="topbar__user"><span class="dot"></span><span id="whoami"></span></span>
-      <button id="logoutBtn" class="btn btn-sm btn-ghost">Выйти</button>
+    <div class="tg-lists">
+      <ul id="chatList" class="chat-list"></ul>
     </div>
-  </header>
+  </aside>
 
-  <nav class="tabs">
-    <button class="tab active" data-tab="chats">💬 Чаты</button>
-    <button class="tab" data-tab="operators">👥 Операторы</button>
-    <button class="tab" data-tab="templates">🗒 Шаблоны</button>
-    <button class="tab" data-tab="queue">📥 Очередь</button>
-    <button class="tab" data-tab="stats">📊 Статистика</button>
-  </nav>
+  <main class="tg-main">
+    <div id="chatHeader" class="tg-chat-header">
+      <div class="chat-header__title"><span class="placeholder">Выберите чат</span></div>
+      <button id="deleteChatBtn" class="btn btn-sm btn-outline-danger d-none">Удалить чат</button>
+    </div>
+    <div id="messages" class="messages">
+      <div class="messages__empty"><div class="icon">&#128172;</div>Выберите чат, чтобы просмотреть переписку.</div>
+    </div>
+    <form id="composerForm" class="composer d-none">
+      <div class="dropdown" id="tplDropdown">
+        <button class="icon-btn" type="button" id="tplToggle" title="Шаблоны">&#128196;</button>
+        <ul class="dropdown-menu" id="templatesMenu"></ul>
+      </div>
+      <input type="text" id="composerInput" class="form-control" placeholder="Написать сообщение…" autocomplete="off">
+      <button class="btn btn-primary" type="submit" title="Отправить">&#10148;</button>
+    </form>
+  </main>
+</div>
 
-  <div class="content">
-    <!-- Чаты -->
-    <section id="tab-chats" class="layout">
-      <aside class="sidebar">
-        <div class="sidebar__head">Все диалоги</div>
-        <ul id="chatList" class="chat-list"></ul>
-      </aside>
-      <main class="main">
-        <div id="chatHeader" class="chat-header">
-          <div class="chat-header__title"><span>Выберите чат слева</span></div>
-          <button id="deleteChatBtn" class="btn btn-sm btn-outline-danger d-none">Удалить чат</button>
-        </div>
-        <div id="messages" class="messages">
-          <div class="messages__empty"><div class="icon">💬</div>Выберите чат в списке слева, чтобы просмотреть переписку.</div>
-        </div>
-        <form id="composerForm" class="composer d-none">
-          <div class="dropdown" id="tplDropdown">
-            <button class="btn btn-ghost" type="button" id="tplToggle">🗒 Шаблоны</button>
-            <ul class="dropdown-menu" id="templatesMenu"></ul>
-          </div>
-          <input type="text" id="composerInput" class="form-control" placeholder="Напишите сообщение…" autocomplete="off">
-          <button class="btn btn-primary" type="submit">Отправить</button>
-        </form>
-      </main>
-    </section>
+<!-- Боковое меню -->
+<div class="drawer-backdrop d-none" id="drawerBackdrop"></div>
+<aside class="drawer d-none" id="drawer">
+  <div class="drawer__head">
+    <div class="drawer__avatar" id="drawerAvatar">?</div>
+    <div class="drawer__name" id="whoami"></div>
+    <div class="drawer__role">Администратор</div>
+  </div>
+  <div class="drawer__menu">
+    <button class="drawer__item" data-admin="operators"><span class="ic">&#128101;</span> Пользователи</button>
+    <button class="drawer__item" data-admin="templates"><span class="ic">&#128196;</span> Шаблоны ответов</button>
+    <button class="drawer__item" data-admin="queue"><span class="ic">&#128229;</span> Очередь чатов</button>
+    <button class="drawer__item" data-admin="stats"><span class="ic">&#128202;</span> Статистика</button>
+    <div class="drawer__sep"></div>
+    <button class="drawer__item" id="logoutBtn"><span class="ic">&#8617;</span> Выйти</button>
+  </div>
+</aside>
 
-    <!-- Операторы -->
-    <section id="tab-operators" class="panel d-none">
+<!-- Экран управления (открывается из меню) -->
+<div class="admin-modal d-none" id="adminModal">
+  <div class="admin-modal__top">
+    <button class="icon-btn" id="adminClose" aria-label="Назад">&#8592;</button>
+    <span class="admin-modal__title">Управление</span>
+  </div>
+  <div class="admin-modal__tabs">
+    <button class="tab active" data-atab="operators">Пользователи</button>
+    <button class="tab" data-atab="templates">Шаблоны</button>
+    <button class="tab" data-atab="queue">Очередь</button>
+    <button class="tab" data-atab="stats">Статистика</button>
+  </div>
+  <div class="admin-modal__body">
+    <!-- Пользователи -->
+    <section id="tab-operators">
       <div class="grid-2">
         <div class="card">
           <div class="card-body">
-            <h2 class="panel__title" style="font-size:16px;margin-bottom:14px;">Новый оператор</h2>
+            <h2 class="panel__title" style="font-size:16px;margin-bottom:14px;">Новый пользователь</h2>
             <form id="newOperatorForm">
               <div class="mb-2">
                 <label class="form-label">Логин</label>
@@ -68,20 +86,20 @@
                 <label class="form-label">Пароль</label>
                 <input class="form-control" id="newOpPassword" placeholder="Мин. 6 символов" required>
               </div>
-              <button class="btn btn-primary btn-block">Создать оператора</button>
+              <button class="btn btn-primary btn-block">Создать пользователя</button>
               <div id="newOpError" class="login-error" style="margin-top:8px;"></div>
             </form>
           </div>
         </div>
         <div>
-          <h2 class="panel__title">Операторы и доступ к чатам</h2>
+          <h2 class="panel__title">Пользователи и доступ к чатам</h2>
           <div id="operatorsList"></div>
         </div>
       </div>
     </section>
 
     <!-- Шаблоны -->
-    <section id="tab-templates" class="panel d-none">
+    <section id="tab-templates" class="d-none">
       <div class="grid-2">
         <div class="card">
           <div class="card-body">
@@ -93,7 +111,7 @@
               </div>
               <div class="mb-2">
                 <label class="form-label">Текст сообщения</label>
-                <textarea class="form-control" id="newTplText" rows="4" placeholder="Текст, который вставит оператор" required></textarea>
+                <textarea class="form-control" id="newTplText" rows="4" placeholder="Текст, который вставит пользователь" required></textarea>
               </div>
               <button class="btn btn-primary btn-block">Создать шаблон</button>
               <div id="newTplError" class="login-error" style="margin-top:8px;"></div>
@@ -108,18 +126,18 @@
     </section>
 
     <!-- Очередь -->
-    <section id="tab-queue" class="panel d-none">
+    <section id="tab-queue" class="d-none">
       <div class="grid-2">
         <div class="card">
           <div class="card-body">
             <h2 class="panel__title" style="font-size:16px;margin-bottom:6px;">Отправить чат в очередь</h2>
-            <p class="text-muted small" style="margin-bottom:14px;">Любой оператор сможет сам взять этот чат в работу.</p>
+            <p class="text-muted small" style="margin-bottom:14px;">Любой пользователь сможет сам взять этот чат в работу.</p>
             <div class="mb-2">
               <label class="form-label">Чат</label>
               <select class="form-select" id="queueChatSelect"></select>
             </div>
             <div class="mb-2">
-              <label class="form-label">Имя для оператора (алиас)</label>
+              <label class="form-label">Имя для пользователя (алиас)</label>
               <input class="form-control" id="queueAlias" placeholder="Например: Клиент №1">
             </div>
             <div class="d-flex gap-2 mb-3" style="margin-top:6px;">
@@ -137,12 +155,12 @@
     </section>
 
     <!-- Статистика -->
-    <section id="tab-stats" class="panel d-none">
-      <h2 class="panel__title">Статистика по операторам</h2>
+    <section id="tab-stats" class="d-none">
+      <h2 class="panel__title">Статистика по пользователям</h2>
       <table class="table">
         <thead>
           <tr>
-            <th>Оператор</th>
+            <th>Пользователь</th>
             <th>Сообщений сегодня</th>
             <th>Сообщений всего</th>
             <th>Назначено чатов</th>
@@ -153,6 +171,7 @@
     </section>
   </div>
 </div>
+
 <script src="js/admin.js"></script>
 </body>
 </html>

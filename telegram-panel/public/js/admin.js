@@ -2,7 +2,7 @@ let allChats = [];
 let currentChatId = null;
 let ws;
 
-// --- Вспомогательные функции представления ---
+// --- Представление ---
 
 function escapeHtml(s) {
   const div = document.createElement('div');
@@ -16,8 +16,8 @@ function initials(name) {
 }
 
 const AVATAR_COLORS = [
-  '#e5484d', '#e07b1a', '#0a9d58', '#2f5be0', '#8e4ec6',
-  '#d6409f', '#0f9b9b', '#c2410c', '#4f46e5', '#0d7490',
+  '#e17076', '#e07b1a', '#4fad2d', '#3390ec', '#8e5db8',
+  '#d84f9e', '#0f9b9b', '#c2410c', '#5a53d6', '#0d7490',
 ];
 
 function avatarColor(key) {
@@ -28,8 +28,7 @@ function avatarColor(key) {
 }
 
 function fmtTime(ts) {
-  const d = new Date(ts);
-  return d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+  return new Date(ts).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
 }
 
 function avatarEl(name, key) {
@@ -52,25 +51,51 @@ async function loadMe() {
     return;
   }
   document.getElementById('whoami').textContent = me.username;
+  document.getElementById('drawerAvatar').textContent = initials(me.username);
 }
 
-// --- Вкладки ---
+// --- Меню (☰) и экран управления ---
 
-const TABS = ['chats', 'operators', 'templates', 'queue', 'stats'];
+const drawer = document.getElementById('drawer');
+const backdrop = document.getElementById('drawerBackdrop');
+function toggleDrawer(show) {
+  drawer.classList.toggle('d-none', !show);
+  backdrop.classList.toggle('d-none', !show);
+}
+document.getElementById('menuBtn').addEventListener('click', () => toggleDrawer(true));
+backdrop.addEventListener('click', () => toggleDrawer(false));
 
-document.querySelectorAll('[data-tab]').forEach((btn) => {
-  btn.addEventListener('click', () => {
-    document.querySelectorAll('[data-tab]').forEach((b) => b.classList.remove('active'));
-    btn.classList.add('active');
-    TABS.forEach((tab) => {
-      document.getElementById(`tab-${tab}`).classList.toggle('d-none', btn.dataset.tab !== tab);
-    });
-    if (btn.dataset.tab === 'operators') loadOperators();
-    if (btn.dataset.tab === 'templates') loadTemplatesList();
-    if (btn.dataset.tab === 'queue') loadQueueAdmin();
-    if (btn.dataset.tab === 'stats') loadStats();
+const adminModal = document.getElementById('adminModal');
+const ADMIN_TABS = ['operators', 'templates', 'queue', 'stats'];
+
+function openAdminTab(name) {
+  document.querySelectorAll('.admin-modal__tabs .tab').forEach((t) => {
+    t.classList.toggle('active', t.dataset.atab === name);
+  });
+  ADMIN_TABS.forEach((tab) => {
+    document.getElementById(`tab-${tab}`).classList.toggle('d-none', tab !== name);
+  });
+  if (name === 'operators') loadOperators();
+  if (name === 'templates') loadTemplatesList();
+  if (name === 'queue') loadQueueAdmin();
+  if (name === 'stats') loadStats();
+}
+
+document.querySelectorAll('.drawer__item[data-admin]').forEach((item) => {
+  item.addEventListener('click', () => {
+    toggleDrawer(false);
+    adminModal.classList.remove('d-none');
+    openAdminTab(item.dataset.admin);
   });
 });
+document.querySelectorAll('.admin-modal__tabs .tab').forEach((tab) => {
+  tab.addEventListener('click', () => openAdminTab(tab.dataset.atab));
+});
+document.getElementById('adminClose').addEventListener('click', () => {
+  adminModal.classList.add('d-none');
+});
+
+// --- Список чатов ---
 
 async function loadChats() {
   const res = await fetch('/api/chats');
@@ -84,6 +109,7 @@ async function loadChats() {
     const li = document.createElement('li');
     li.className = 'chat-item';
     li.dataset.chatId = chat.chatId;
+    li.dataset.title = chat.title.toLowerCase();
     const body = document.createElement('span');
     body.className = 'chat-item__body';
     const title = document.createElement('span');
@@ -107,6 +133,13 @@ async function loadChats() {
     });
   }
 }
+
+document.getElementById('chatSearch').addEventListener('input', (e) => {
+  const q = e.target.value.trim().toLowerCase();
+  document.querySelectorAll('#chatList .chat-item').forEach((el) => {
+    el.style.display = !q || (el.dataset.title || '').includes(q) ? '' : 'none';
+  });
+});
 
 async function openChat(chat) {
   currentChatId = chat.chatId;
@@ -133,7 +166,7 @@ async function loadMessages() {
   const box = document.getElementById('messages');
   box.innerHTML = '';
   if (messages.length === 0) {
-    box.innerHTML = '<div class="messages__empty"><div class="icon">📭</div>В этом чате пока нет сообщений.</div>';
+    box.innerHTML = '<div class="messages__empty"><div class="icon">&#128235;</div>В этом чате пока нет сообщений.</div>';
     return;
   }
   messages.forEach(appendMessage);
@@ -198,8 +231,8 @@ document.getElementById('deleteChatBtn').addEventListener('click', async () => {
   await fetch(`/api/admin/chats/${encodeURIComponent(currentChatId)}`, { method: 'DELETE' });
   currentChatId = null;
   document.getElementById('messages').innerHTML =
-    '<div class="messages__empty"><div class="icon">💬</div>Выберите чат в списке слева, чтобы просмотреть переписку.</div>';
-  document.querySelector('#chatHeader .chat-header__title').innerHTML = '<span>Выберите чат слева</span>';
+    '<div class="messages__empty"><div class="icon">&#128172;</div>Выберите чат, чтобы просмотреть переписку.</div>';
+  document.querySelector('#chatHeader .chat-header__title').innerHTML = '<span class="placeholder">Выберите чат</span>';
   document.getElementById('deleteChatBtn').classList.add('d-none');
   document.getElementById('composerForm').classList.add('d-none');
   loadChats();
@@ -245,7 +278,7 @@ async function loadTemplatesMenu() {
   });
 }
 
-// --- Операторы ---
+// --- Пользователи ---
 
 document.getElementById('newOperatorForm').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -273,7 +306,7 @@ async function loadOperators() {
   const container = document.getElementById('operatorsList');
   container.innerHTML = '';
   if (operators.length === 0) {
-    container.innerHTML = '<div class="empty">Операторов пока нет — создайте первого слева.</div>';
+    container.innerHTML = '<div class="empty">Пользователей пока нет — создайте первого слева.</div>';
     return;
   }
   operators.forEach((op) => {
@@ -292,7 +325,7 @@ async function loadOperators() {
             <select class="form-select form-select-sm chat-select"></select>
           </div>
           <div class="grow">
-            <label class="form-label">Алиас для оператора</label>
+            <label class="form-label">Алиас для пользователя</label>
             <input class="form-control form-control-sm alias-input" placeholder="напр. Клиент №1">
           </div>
           <label class="form-check"><input class="form-check-input can-send" type="checkbox" checked><span class="form-check-label">Отправка</span></label>
@@ -374,7 +407,7 @@ async function loadOperators() {
     });
 
     card.querySelector('.delete-op').addEventListener('click', async () => {
-      if (!confirm(`Удалить оператора ${op.username}?`)) return;
+      if (!confirm(`Удалить пользователя ${op.username}?`)) return;
       await fetch(`/api/admin/operators/${op.id}`, { method: 'DELETE' });
       loadOperators();
     });
@@ -388,7 +421,7 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
   window.location.href = 'login.html';
 });
 
-// --- Шаблоны: библиотека (вкладка) ---
+// --- Шаблоны: библиотека ---
 
 document.getElementById('newTemplateForm').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -515,7 +548,7 @@ async function loadStats() {
   const body = document.getElementById('statsBody');
   body.innerHTML = '';
   if (stats.length === 0) {
-    body.innerHTML = '<tr><td colspan="4" class="text-muted">Операторов пока нет</td></tr>';
+    body.innerHTML = '<tr><td colspan="4" class="text-muted">Пользователей пока нет</td></tr>';
     return;
   }
   stats.forEach((s) => {
@@ -540,7 +573,10 @@ function connectWs() {
       const box = document.getElementById('messages');
       box.scrollTop = box.scrollHeight;
     } else if (data.type === 'queue:new' || data.type === 'queue:removed') {
-      if (!document.getElementById('tab-queue').classList.contains('d-none')) loadQueueAdmin();
+      if (!document.getElementById('tab-queue').classList.contains('d-none')
+          && !adminModal.classList.contains('d-none')) {
+        loadQueueAdmin();
+      }
     }
   };
   ws.onclose = () => setTimeout(connectWs, 3000);
