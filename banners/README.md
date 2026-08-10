@@ -1,23 +1,29 @@
-# AS Talent Agency — banners
+# Recruitment banner — OnlyFans / Fansly
 
 Leaderboard banner for datingforum.com.ua (model recruitment, 18+).
 
-## Deliverables
-- `as-talent-970x90.png` — 970×90, ~124 KB
-- `as-talent-970x90.jpg` — 970×90, ~30 KB (lighter, use if the forum caps file size)
+## Deliverables (970×90)
+- `banner-onlyfans-fansly-970x90.jpg` — ~34 KB (lightest, recommended for upload)
+- `banner-onlyfans-fansly-970x90.png` — ~88 KB
+- `banner-onlyfans-fansly-1940x180.png` — ~308 KB (**@2× retina**, crispest, still < 600 KB)
+- `banner-onlyfans-fansly-1940x180.jpg` — ~92 KB (@2×)
 
-Both are well under the 512 KB target.
+Display slot is 970×90 — upload the @2× file for the sharpest result on all screens.
+The whole image is meant to be a single clickable link to the recruitment thread.
 
 ## Design
-Dark-luxe + metallic gold palette in the style of astalentagency.com.
-Trust cues are carried by the design, not the copy: ★★★★★ mark, gold frame with
-corner ticks, `AS` monogram watermark, strict Montserrat/Oswald typography.
-Platform focus: **OnlyFans** and **Fansly** (branded blue badges).
+White-blue, in the platforms' native colors. Official **OnlyFans** and **fansly**
+logos on the left, headline + pink CTA in the center, model on the right,
+benefits strip, and the top slogan "A partner of talented agencies".
+
+## Assets (`source/assets/`)
+- `of_zip1/onlyfans-seeklogo.png`, `fansly_full.png` — platform logos (provided)
+- `girl.png` — model image (provided, transparent PNG)
+- `fonts/` — Montserrat + Oswald (embedded at build time)
 
 ## Rebuild
 ```
 cd source
-node build.js     # embeds fonts -> banner.html
-node render.js    # renders 2x then downscales -> ../as-talent-970x90.{png,jpg}
+node build.js   # renders 970×90 and @2× 1940×180 PNG + JPG
 ```
-Requires Playwright + Chromium. Edit copy/colors in `source/build.js`.
+Requires Playwright + Chromium. Edit copy/colors/layout in `source/build.js`.
