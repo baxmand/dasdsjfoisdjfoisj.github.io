@@ -181,10 +181,8 @@ slide('bg-contact.png', [
   kick("LET'S TALK  /  ДАВАЙТЕ РАБОТАТЬ", 0.9, 1.85),
   box({ text: 'Unlock your true<br>potential.', x: 0.85, y: 2.25, w: 9, fs: 52, bold: true, lh: 1.0 }),
   box({ text: 'Присоединяйся к AS Talent Agency — и раскрой свой потенциал вместе с нами.', x: 0.9, y: 4.2, w: 8.4, fs: 17, color: TEXT }),
-  panel(0.9, 5.15, 3.4, 0.9),
-  box({ text: 'astalentagency.com', x: 0.9, y: 5.15, w: 3.4, h: 0.9, fs: 15, bold: true, align: 'center', valign: 'middle' }),
-  panel(4.45, 5.15, 3.4, 0.9),
-  box({ text: '@astalentagency', x: 4.45, y: 5.15, w: 3.4, h: 0.9, fs: 15, bold: true, color: PINK2, align: 'center', valign: 'middle' }),
+  panel(0.9, 5.15, 3.9, 0.9),
+  box({ text: 'astalentagency.com', x: 0.9, y: 5.15, w: 3.9, h: 0.9, fs: 15, bold: true, align: 'center', valign: 'middle' }),
 ]);
 
 const html = `<!doctype html><html><head><meta charset="utf-8"><style>

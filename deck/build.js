@@ -257,10 +257,8 @@ kicker(s, "LET'S TALK  /  ДАВАЙТЕ РАБОТАТЬ", 0.9, 1.85);
 s.addText('Unlock your true\npotential.', { x: 0.85, y: 2.25, w: 9, h: 1.9, fontFace: FONT, fontSize: 52, bold: true, color: WHITE, lineSpacingMultiple: 1.0 });
 s.addText('Присоединяйся к AS Talent Agency — и раскрой свой потенциал вместе с нами.',
   { x: 0.9, y: 4.2, w: 8.4, h: 0.6, fontFace: FONT, fontSize: 17, color: TEXT });
-panel(s, 0.9, 5.15, 3.4, 0.9, CARD);
-s.addText('astalentagency.com', { x: 0.9, y: 5.15, w: 3.4, h: 0.9, fontFace: FONT, fontSize: 15, bold: true, color: WHITE, align: 'center', valign: 'middle' });
-panel(s, 4.45, 5.15, 3.4, 0.9, CARD);
-s.addText('@astalentagency', { x: 4.45, y: 5.15, w: 3.4, h: 0.9, fontFace: FONT, fontSize: 15, bold: true, color: PINK2, align: 'center', valign: 'middle' });
+panel(s, 0.9, 5.15, 3.9, 0.9, CARD);
+s.addText('astalentagency.com', { x: 0.9, y: 5.15, w: 3.9, h: 0.9, fontFace: FONT, fontSize: 15, bold: true, color: WHITE, align: 'center', valign: 'middle' });
 s.addNotes('Контакты и призыв к действию. astalentagency.com');
 
 p.writeFile({ fileName: __dirname + '/AS-Talent-Agency.pptx' }).then(f => console.log('saved', f));
