@@ -1,13 +1,15 @@
-// HTML mirror of build.js (v2 redesign) for visual QA. Same inch coords -> px*96.
+// HTML mirror of build.js (v3 editorial redesign, English) for QA and PDF.
 const fs = require('fs');
 const A = 'file://' + __dirname + '/assets/';
 const PX = 96, PT = 96 / 72;
-const PINK = '#FF149A', PINK2 = '#FF3EA5', PINK_DEEP = '#C8006A', WHITE = '#fff',
-  TEXT = '#D7D7DC', MUTE = '#9A9AA4', CARD = '#141419', CARD2 = '#1B1B21';
+const PINK = '#FF2E8D', PINK2 = '#FF6FB0', WHITE = '#fff', TEXT = '#ECECEF', MUTE = '#8C8C95',
+  CARD = '#141418', CARD2 = '#1B1B21';
+const DISP = "Georgia, 'Times New Roman', serif";  // serif stand-in for Cambria in QA
+const SANS = 'Arial, Helvetica, sans-serif';
 
 let slides = [];
 function box(o) {
-  const st = [`left:${o.x * PX}px`, `top:${o.y * PX}px`, `width:${o.w * PX}px`];
+  const st = [`left:${o.x * PX}px`, `top:${o.y * PX}px`, `width:${o.w * PX}px`, `font-family:${o.ff || SANS}`];
   if (o.h) st.push(`height:${o.h * PX}px`);
   if (o.fs) st.push(`font-size:${o.fs * PT}px`);
   st.push(`color:${o.color || WHITE}`, `font-weight:${o.bold ? 700 : 400}`, `text-align:${o.align || 'left'}`);
@@ -15,6 +17,7 @@ function box(o) {
   if (o.cs) st.push(`letter-spacing:${o.cs}px`);
   if (o.lh) st.push(`line-height:${o.lh}`);
   if (o.valign === 'middle') st.push('display:flex', 'align-items:center', o.align === 'center' ? 'justify-content:center' : 'justify-content:flex-start');
+  if (o.valign === 'bottom') st.push('display:flex', 'align-items:flex-end');
   return `<div class="t" style="${st.join(';')}">${o.text.replace(/\n/g, '<br>')}</div>`;
 }
 function rect(o) {
@@ -24,172 +27,160 @@ function rect(o) {
   return `<div class="s" style="${st.join(';')}"></div>`;
 }
 const ell = (o) => rect({ ...o, r: o.w / 2 });
-const img = (o) => `<img class="im" style="left:${o.x * PX}px;top:${o.y * PX}px;width:${o.w * PX}px;height:${o.h * PX}px" src="${A}${o.src}">`;
-const panel = (x, y, w, h, fill) => rect({ x, y, w, h, r: 0.13, fill: fill || CARD, border: '1px solid rgba(255,255,255,.12)' });
-function chip(x, y, d, label, fs) {
-  return ell({ x, y, w: d, h: d, fill: PINK, border: '1px solid ' + PINK2 })
-    + box({ text: label, x, y, w: d, h: d, fs: fs || 18, bold: true, color: WHITE, align: 'center', valign: 'middle' });
-}
+const img = (o) => `<img class="im" style="left:${o.x * PX}px;top:${o.y * PX}px;width:${o.w * PX}px;height:${o.h * PX}px;border-radius:${(o.r || 0) * PX}px" src="${A}${o.src}">`;
+const panel = (x, y, w, h, fill) => rect({ x, y, w, h, r: 0.12, fill: fill || CARD, border: '1px solid rgba(255,255,255,.12)' });
 function kick(text, x, y) {
-  return ell({ x, y: y + 0.06, w: 0.12, h: 0.12, fill: PINK })
-    + box({ text, x: x + 0.26, y, w: 9, fs: 12, bold: true, color: PINK2, cs: 3 });
+  return ell({ x, y: y + 0.06, w: 0.11, h: 0.11, fill: PINK })
+    + box({ text, x: x + 0.25, y, w: 10, fs: 12, bold: true, color: PINK2, cs: 3 });
 }
-const heading = (ru, y) => box({ text: ru, x: 0.66, y, w: 11, fs: 40, bold: true });
+const title = (text, y, size) => box({ text, x: 0.64, y, w: 11.5, fs: size || 44, bold: true, ff: DISP });
+const serifNum = (x, y, n) => box({ text: n, x, y, w: 1.6, fs: 44, bold: true, italic: true, color: PINK2, ff: DISP });
+const line = (x, y, w) => rect({ x, y, w, h: 0.02, fill: PINK });
 const slide = (bg, parts) => slides.push(`<div class="slide" style="background-image:url('${A}${bg}')">${parts.join('')}</div>`);
 
-// S1 cover
+// 1 cover
 slide('bg-cover.png', [
-  kick('TALENT  ·  SOCIAL MEDIA  ·  ONLYFANS', 0.9, 1.3),
-  box({ text: 'AS Talent', x: 0.85, y: 1.75, w: 11, fs: 68, bold: true }),
-  box({ text: `Agency <span style="color:${MUTE}">   /   </span><span style="color:${PINK2}">AS Superpowers</span>`, x: 0.88, y: 2.95, w: 11.5, fs: 30, bold: true }),
-  box({ text: 'Управление талантами, соцсетями и OnlyFans — 24/7.<br>Helping creators unlock their true potential.', x: 0.9, y: 4.05, w: 8.6, fs: 17, color: TEXT, lh: 1.3 }),
+  kick('TALENT  ·  SOCIAL MEDIA  ·  ONLYFANS', 0.9, 1.35),
+  box({ text: 'AS Talent Agency', x: 0.85, y: 1.85, w: 11.5, fs: 70, bold: true, ff: DISP }),
+  box({ text: `<span style="color:${PINK2}">AS Superpowers</span><span style="color:${MUTE}">  —  a premium creator management house</span>`, x: 0.9, y: 3.25, w: 11.5, fs: 20, bold: true }),
+  box({ text: 'We manage talent, social media and OnlyFans, around the clock —<br>so creators can focus on what they do best.', x: 0.9, y: 4.15, w: 8.6, fs: 17, color: TEXT, lh: 1.3 }),
   box({ text: 'astalentagency.com', x: 0.9, y: 6.7, w: 5, fs: 14, bold: true }),
   box({ text: 'OnlyFans · Instagram · TikTok · X', x: 7.4, y: 6.7, w: 5.0, fs: 12, bold: true, color: MUTE, align: 'right', cs: 1 }),
 ]);
 
-// S2 who
-const rows = [['Personalized strategy', 'Индивидуальная стратегия под каждого автора.'],
-['Full-cycle management', 'Управление под ключ: контент, соцсети, чаттинг, аналитика.'],
-['Global roster', 'Работаем с топ-моделями и блогерами по всему миру.']];
-let p2 = [kick('WHO WE ARE', 0.7, 0.55), heading('Кто мы', 0.85),
-box({ text: 'AS Talent — ведущее агентство по маркетингу и менеджменту OnlyFans. Более 3 лет мы помогаем авторам раскрыть потенциал и кратно увеличить доход. Мы берём на себя весь бизнес — от стратегии и соцсетей до общения с фанатами — а автор фокусируется на контенте.', x: 0.7, y: 1.95, w: 6.4, fs: 15.5, color: TEXT, lh: 1.3 })];
-let ry = 3.9;
+// 2 who
+const rows = [['Personalized strategy', 'A tailored game plan for every creator — no two are alike.'],
+['Full-cycle management', 'Turnkey: content, social, chatting and analytics.'],
+['Global roster', 'We work with top models and influencers worldwide.']];
+let p2 = [kick('WHO WE ARE', 0.7, 0.55), title('Who we are', 0.9),
+box({ text: 'AS Talent is a leading OnlyFans marketing and management agency. For 3+ years we have helped creators unlock their potential and multiply their income. We run the entire business — from strategy and social media to fan communication — while the creator focuses on content.', x: 0.7, y: 2.0, w: 6.4, fs: 15.5, color: TEXT, lh: 1.32 })];
+let ry = 3.95;
 rows.forEach(([h, d]) => {
-  p2.push(ell({ x: 0.72, y: ry + 0.02, w: 0.16, h: 0.16, fill: PINK }));
-  p2.push(box({ text: h, x: 1.15, y: ry - 0.16, w: 5.95, fs: 15, bold: true, color: PINK2 }));
-  p2.push(box({ text: d, x: 1.15, y: ry + 0.2, w: 5.95, fs: 12.5, color: '#C2C2C8' }));
-  ry += 1.0;
+  p2.push(ell({ x: 0.72, y: ry + 0.02, w: 0.15, h: 0.15, fill: PINK }));
+  p2.push(box({ text: h, x: 1.12, y: ry - 0.17, w: 5.95, fs: 15, bold: true, color: PINK2 }));
+  p2.push(box({ text: d, x: 1.12, y: ry + 0.19, w: 5.95, fs: 12.5, color: '#C2C2C8' }));
+  ry += 0.98;
 });
-p2.push(panel(7.7, 1.95, 4.95, 4.6));
-p2.push(box({ text: '“No two creators<br>are alike.”', x: 8.05, y: 2.35, w: 4.3, fs: 27, bold: true, lh: 1.05 }));
-p2.push(box({ text: 'Мы не используем шаблонные решения — стратегия строится под бренд и цели каждого автора.', x: 8.05, y: 3.8, w: 4.3, fs: 13.5, color: '#BEBEC4', lh: 1.25 }));
-p2.push(box({ text: '«За 3 месяца количество подписчиков удвоилось, а доход вырос втрое.»', x: 8.05, y: 5.2, w: 4.3, fs: 13, italic: true, color: PINK2, lh: 1.2 }));
-p2.push(box({ text: '— отзыв автора / creator testimonial', x: 8.05, y: 6.1, w: 4.3, fs: 10.5, color: MUTE }));
+p2.push(panel(7.7, 2.0, 4.95, 4.55));
+p2.push(box({ text: '“No two creators<br>are alike.”', x: 8.05, y: 2.4, w: 4.3, fs: 29, bold: true, ff: DISP, lh: 1.05 }));
+p2.push(box({ text: 'We never ship template solutions — the strategy is built around each creator’s brand and goals.', x: 8.05, y: 3.9, w: 4.3, fs: 13.5, color: '#BEBEC4', lh: 1.25 }));
+p2.push(line(8.05, 5.06, 4.25));
+p2.push(box({ text: '“Within 3 months my subscriber count doubled, and my monthly income tripled.”', x: 8.05, y: 5.25, w: 4.3, fs: 13, italic: true, color: PINK2, lh: 1.2 }));
+p2.push(box({ text: '— creator testimonial', x: 8.05, y: 6.15, w: 4.3, fs: 10.5, color: MUTE }));
 slide('bg-content.png', p2);
 
-// S3 roster
+// 3 roster
 const roster = [
-  { name: 'Elizabeth Anokhina', foll: '45M', img: 'av-elizabeth.png', soc: ['x', 'tiktok', 'instagram'] },
-  { name: 'Eli Vasilenko', foll: '10.5M', img: 'av-eli.png', soc: ['x', 'tiktok', 'instagram'] },
-  { name: 'Little Caprice', foll: '11M', img: 'av-caprice.png', soc: ['tiktok', 'instagram'] },
-  { name: 'Macca', foll: '1.5M', img: 'av-macca.png', soc: ['x', 'tiktok', 'instagram'] },
-  { name: 'Kuri Emi', foll: '2.5M', img: 'av-kuri.png', soc: ['x', 'tiktok', 'instagram'] },
-  { name: 'Qimmah Russo', foll: '5M', img: 'av-qimmah.png', soc: ['x', 'tiktok', 'instagram'] },
-  { name: 'Chloe Amour', foll: '2.4M', img: 'av-chloe.png', soc: ['x', 'tiktok', 'instagram'] },
-  { name: 'Zlata Sharvarok', foll: '1M', img: 'av-zlata.png', soc: ['x', 'tiktok', 'instagram'] }];
-const icMap = { x: 'ic-x.png', tiktok: 'ic-tiktok.png', instagram: 'ic-instagram.png' };
-const DIA = 0.30, GAP = 0.14, ICON = 0.17, AV = 1.15, margin = 0.9, usable = 13.333 - 2 * margin;
-const N = roster.length, topN = Math.ceil(N / 2), rowsArr = [roster.slice(0, topN), roster.slice(topN)], rowTopY = [1.55, 4.35];
-let p3 = [kick('OUR TALENT  /  НАШИ ТАЛАНТЫ', 0.7, 0.5), box({ text: 'AS Superpowers', x: 0.66, y: 0.82, w: 8, fs: 38, bold: true }),
-  box({ text: 'FEATURED  ·  150+ CREATORS ON ROSTER<br>Избранные — часть ростера из 150+ креаторов', x: 7.0, y: 1.02, w: 5.4, fs: 11.5, bold: true, color: MUTE, align: 'right', cs: 0.5, lh: 1.15 })];
-rowsArr.forEach((items, ri) => {
-  const k = items.length, cellW = usable / k, top = rowTopY[ri];
-  items.forEach((t, ci) => {
-    const cx = margin + (ci + 0.5) * cellW;
-    p3.push(img({ src: t.img, x: cx - AV / 2, y: top, w: AV, h: AV }));
-    p3.push(box({ text: t.name.toUpperCase(), x: cx - cellW / 2, y: top + AV + 0.05, w: cellW, fs: 13, bold: true, color: PINK2, align: 'center' }));
-    p3.push(box({ text: t.foll + ' FOLLOWERS', x: cx - cellW / 2, y: top + AV + 0.6, w: cellW, fs: 10, color: MUTE, cs: 1, align: 'center' }));
-    const n = t.soc.length, totalW = n * DIA + (n - 1) * GAP; let ix = cx - totalW / 2; const iy = top + AV + 0.95;
-    t.soc.forEach(sc => {
-      p3.push(ell({ x: ix, y: iy, w: DIA, h: DIA, fill: '#F2F2F2' }));
-      p3.push(img({ src: icMap[sc], x: ix + (DIA - ICON) / 2, y: iy + (DIA - ICON) / 2, w: ICON, h: ICON }));
-      ix += DIA + GAP;
-    });
-  });
+  ['Elizabeth Anokhina', '45M followers', 'p-elizabeth.png'],
+  ['Elizabeth Vasilenko', '10.5M followers', 'p-eli.png'],
+  ['Little Caprice', '11M followers', 'p-caprice.png'],
+  ['Macca', '1.5M followers', 'p-macca.png'],
+  ['Kuri Emi', '2.5M followers', 'p-kuri.png'],
+  ['Qimmah Russo', '5M followers', 'p-qimmah.png'],
+  ['Chloe Amour', '2.4M followers', 'p-chloe.png'],
+  ['Zlata Sharvarok', '1M followers', 'p-zlata.png']];
+const mgn = 0.55, gap = 0.28, cardW = (13.333 - 2 * mgn - 3 * gap) / 4, rowY = [1.62, 4.58];
+let p3 = [kick('OUR TALENT', 0.7, 0.5), title('The Roster', 0.8, 40),
+  box({ text: 'FEATURED SELECTION<br>Part of a 150+ creator roster', x: 7.6, y: 0.92, w: 4.8, fs: 11.5, bold: true, color: MUTE, align: 'right', cs: 0.5, lh: 1.2 })];
+roster.forEach((t, i) => {
+  const col = i % 4, row = Math.floor(i / 4), x = mgn + col * (cardW + gap), y = rowY[row];
+  p3.push(img({ src: t[2], x, y, w: cardW, h: cardW, r: 0.16 }));
+  p3.push(rect({ x, y, w: cardW, h: cardW, r: 0.16, border: '1px solid rgba(255,46,141,.55)' }));
+  p3.push(box({ text: t[0], x: x + 0.16, y: y + cardW - 0.68, w: cardW - 0.32, h: 0.36, fs: 15, bold: true, ff: DISP, valign: 'bottom' }));
+  p3.push(box({ text: t[1].toUpperCase(), x: x + 0.16, y: y + cardW - 0.3, w: cardW - 0.32, fs: 9.5, bold: true, color: PINK2, cs: 1 }));
 });
 slide('bg-content.png', p3);
 
-// S4 services
-const services = [['24/7 OnlyFans Coverage', 'Круглосуточное ведение OnlyFans: чаттинг, продажи, удержание и апселлы. Персональный менеджер у каждого автора.'],
-['Social Media Management', 'Ведение и оптимизация Instagram, TikTok и X: контент-план, трафик и рост аудитории.'],
-['Content Houses', 'Съёмки и продакшн в контент-хаусах: идеи, контроль качества и стабильный поток контента.']];
+// 4 services
+const services = [['24/7 OnlyFans Coverage', 'Round-the-clock OnlyFans operations: chatting, sales, retention and upsells. A dedicated manager for every creator.'],
+['Social Media Management', 'Growing and optimizing Instagram, TikTok and X: content plan, traffic and audience growth.'],
+['Content Houses', 'Shoots and production in our content houses: ideas, quality control and a steady content flow.']];
 const cW = 3.85, cH = 3.15, cGap = 0.35, sX = (13.333 - (3 * cW + 2 * cGap)) / 2;
-let p4 = [kick('WHAT WE DO', 0.7, 0.55), heading('Услуги', 0.85)];
+let p4 = [kick('WHAT WE DO', 0.7, 0.55), title('What we do', 0.9)];
 services.forEach(([h, d], i) => {
-  const x = sX + i * (cW + cGap), y = 2.0;
+  const x = sX + i * (cW + cGap), y = 2.05;
   p4.push(panel(x, y, cW, cH));
-  p4.push(chip(x + 0.35, y + 0.35, 0.66, String(i + 1), 22));
-  p4.push(box({ text: h, x: x + 0.35, y: y + 1.2, w: cW - 0.7, fs: 17.5, bold: true }));
-  p4.push(box({ text: d, x: x + 0.35, y: y + 2.05, w: cW - 0.7, fs: 12.5, color: '#C2C2C8', lh: 1.22 }));
+  p4.push(serifNum(x + 0.33, y + 0.28, '0' + (i + 1)));
+  p4.push(line(x + 0.35, y + 1.28, 0.6));
+  p4.push(box({ text: h, x: x + 0.35, y: y + 1.42, w: cW - 0.7, fs: 19, bold: true, ff: DISP }));
+  p4.push(box({ text: d, x: x + 0.35, y: y + 2.2, w: cW - 0.7, fs: 12.5, color: '#C2C2C8', lh: 1.22 }));
 });
-const sub = ['Chatting & Sales / Чаттинг и продажи', 'Content Planning / Контент-план', 'Analytics & Growth / Аналитика и рост'];
+const sub = ['Chatting & Sales', 'Content Planning', 'Analytics & Growth'];
 sub.forEach((t, i) => {
-  const x = sX + i * (cW + cGap), y = 5.5;
-  p4.push(panel(x, y, cW, 0.75, CARD2));
-  p4.push(ell({ x: x + 0.3, y: y + 0.25, w: 0.24, h: 0.24, fill: PINK }));
-  p4.push(box({ text: t, x: x + 0.72, y, w: cW - 0.9, h: 0.75, fs: 12, bold: true, color: '#E4E4E8', valign: 'middle' }));
+  const x = sX + i * (cW + cGap), y = 5.55;
+  p4.push(panel(x, y, cW, 0.72, CARD2));
+  p4.push(ell({ x: x + 0.3, y: y + 0.24, w: 0.22, h: 0.22, fill: PINK }));
+  p4.push(box({ text: t, x: x + 0.7, y, w: cW - 0.9, h: 0.72, fs: 13, bold: true, color: '#E4E4E8', valign: 'middle' }));
 });
 slide('bg-content.png', p4);
 
-// S5 numbers
-const stats = [['150+', 'Creators on roster', 'Креаторов в ростере'], ['3+', 'Years of experience', 'Года опыта'],
-['24/7', 'Dedicated support', 'Поддержка без выходных'], ['Global', 'Worldwide talent', 'Таланты по всему миру']];
+// 5 numbers
+const stats = [['150+', 'Creators on roster'], ['3+', 'Years of experience'], ['24/7', 'Dedicated support'], ['Global', 'Talent worldwide']];
 const nW = 2.86, nGap = 0.3, nX = (13.333 - (4 * nW + 3 * nGap)) / 2;
-let p5 = [kick('BY THE NUMBERS', 0.7, 0.55), heading('Цифры', 0.85)];
-stats.forEach(([big, en, ru], i) => {
-  const x = nX + i * (nW + nGap), y = 2.1;
-  p5.push(panel(x, y, nW, 2.35));
-  p5.push(box({ text: big, x, y: y + 0.4, w: nW, fs: 46, bold: true, color: PINK2, align: 'center' }));
-  p5.push(box({ text: en, x, y: y + 1.5, w: nW, fs: 13.5, bold: true, align: 'center' }));
-  p5.push(box({ text: ru, x, y: y + 1.85, w: nW, fs: 11.5, color: MUTE, align: 'center' }));
+let p5 = [kick('BY THE NUMBERS', 0.7, 0.55), title('By the numbers', 0.9)];
+stats.forEach(([big, en], i) => {
+  const x = nX + i * (nW + nGap), y = 2.15;
+  p5.push(panel(x, y, nW, 2.3));
+  p5.push(box({ text: big, x, y: y + 0.45, w: nW, fs: 50, bold: true, color: PINK2, align: 'center', ff: DISP }));
+  p5.push(box({ text: en, x, y: y + 1.6, w: nW, fs: 14, bold: true, align: 'center' }));
 });
 const fW = 4 * nW + 3 * nGap;
-p5.push(panel(nX, 5.0, fW, 1.35));
-p5.push(box({ text: '“Within 3 months my subscriber count doubled, and my monthly income tripled.”', x: nX + 0.5, y: 5.2, w: fW - 1.0, fs: 16, bold: true, italic: true, align: 'center' }));
-p5.push(box({ text: '«За 3 месяца подписчики удвоились, а доход вырос втрое.» — отзыв автора', x: nX + 0.5, y: 5.8, w: fW - 1.0, fs: 12.5, color: PINK2, align: 'center' }));
+p5.push(panel(nX, 5.05, fW, 1.3));
+p5.push(box({ text: '“Within 3 months my subscriber count doubled, and my monthly income tripled.”', x: nX + 0.5, y: 5.2, w: fW - 1.0, fs: 18, bold: true, italic: true, align: 'center', ff: DISP }));
+p5.push(box({ text: '— creator testimonial', x: nX + 0.5, y: 5.85, w: fW - 1.0, fs: 12, color: PINK2, align: 'center' }));
 slide('bg-content.png', p5);
 
-// S6 process
-const steps = [['Onboarding', 'Знакомство', 'Изучаем автора, бренд и цели. Закрепляем персонального менеджера.'],
-['Strategy', 'Стратегия', 'Строим индивидуальный план роста и монетизации.'],
-['Content & Social', 'Контент и соцсети', 'Контент-план, съёмки, ведение Instagram, TikTok и X.'],
-['Growth & Retention', 'Рост и удержание', 'Чаттинг, продажи, апселлы, аналитика и масштабирование.']];
+// 6 process
+const steps = [['Onboarding', 'We learn the creator, brand and goals, and assign a dedicated manager.'],
+['Strategy', 'We build a personalized growth and monetization plan.'],
+['Content & Social', 'Content plan, shoots, and running Instagram, TikTok and X.'],
+['Growth & Retention', 'Chatting, sales, upsells, analytics and scaling.']];
 const pW = 2.86, pGap = 0.3, pX = (13.333 - (4 * pW + 3 * pGap)) / 2;
-let p6 = [kick('HOW WE WORK', 0.7, 0.55), heading('Как мы работаем', 0.85)];
-steps.forEach(([en, ru, d], i) => {
+let p6 = [kick('HOW WE WORK', 0.7, 0.55), title('How we work', 0.9)];
+steps.forEach(([en, d], i) => {
   const x = pX + i * (pW + pGap), y = 2.2;
-  p6.push(panel(x, y, pW, 3.6));
-  p6.push(chip(x + 0.35, y + 0.35, 0.85, String(i + 1), 28));
-  p6.push(box({ text: en, x: x + 0.35, y: y + 1.45, w: pW - 0.7, fs: 16, bold: true }));
-  p6.push(box({ text: ru, x: x + 0.35, y: y + 1.85, w: pW - 0.7, fs: 12.5, bold: true, color: PINK2 }));
-  p6.push(box({ text: d, x: x + 0.35, y: y + 2.3, w: pW - 0.7, fs: 12, color: '#C2C2C8', lh: 1.25 }));
+  p6.push(panel(x, y, pW, 3.5));
+  p6.push(serifNum(x + 0.33, y + 0.3, String(i + 1)));
+  p6.push(line(x + 0.35, y + 1.3, 0.6));
+  p6.push(box({ text: en, x: x + 0.35, y: y + 1.45, w: pW - 0.7, fs: 18, bold: true, ff: DISP }));
+  p6.push(box({ text: d, x: x + 0.35, y: y + 2.05, w: pW - 0.7, fs: 12.5, color: '#C2C2C8', lh: 1.28 }));
   if (i < 3) p6.push(box({ text: '→', x: x + pW - 0.02, y: y + 1.35, w: pGap + 0.04, fs: 20, bold: true, color: PINK2, align: 'center' }));
 });
 slide('bg-content.png', p6);
 
-// S7 why
-const why = [['Dedicated manager', 'Персональный менеджер и обучение для каждого клиента.'],
-['24/7 support', 'Команда поддержки на связи круглосуточно.'],
-['Data-driven', 'Решения на основе аналитики и метрик эффективности.'],
-['Creative freedom', 'Вы создаёте контент — мы берём на себя бизнес.'],
-['All levels welcome', 'Работаем с авторами любого уровня — от старта до топа.'],
-['Global reach', 'Модели и блогеры по всему миру, мужчины и женщины.']];
-const wW = 3.85, wGx = 0.35, wH = 1.55, wGy = 0.3, wX = (13.333 - (3 * wW + 2 * wGx)) / 2;
-let p7 = [kick('WHY AS TALENT', 0.7, 0.55), heading('Почему мы', 0.85)];
+// 7 why
+const why = [['Dedicated manager', 'A personal manager and onboarding for every client.'],
+['24/7 support', 'A support team available around the clock.'],
+['Data-driven', 'Decisions based on analytics and performance metrics.'],
+['Creative freedom', 'You create the content — we run the business.'],
+['All levels welcome', 'We work with creators at any level, from start to top.'],
+['Global reach', 'Models and influencers worldwide, men and women.']];
+const wW = 3.85, wGx = 0.35, wH = 1.5, wGy = 0.3, wX = (13.333 - (3 * wW + 2 * wGx)) / 2;
+let p7 = [kick('WHY AS TALENT', 0.7, 0.55), title('Why AS Talent', 0.9)];
 why.forEach(([h, d], i) => {
-  const col = i % 3, row = Math.floor(i / 3), x = wX + col * (wW + wGx), y = 2.1 + row * (wH + wGy);
+  const col = i % 3, row = Math.floor(i / 3), x = wX + col * (wW + wGx), y = 2.15 + row * (wH + wGy);
   p7.push(panel(x, y, wW, wH));
   p7.push(ell({ x: x + 0.3, y: y + 0.32, w: 0.4, h: 0.4, fill: PINK }));
   p7.push(box({ text: '✓', x: x + 0.3, y: y + 0.32, w: 0.4, h: 0.4, fs: 14, bold: true, color: WHITE, align: 'center', valign: 'middle' }));
-  p7.push(box({ text: h, x: x + 0.9, y: y + 0.28, w: wW - 1.15, fs: 15, bold: true, color: PINK2 }));
-  p7.push(box({ text: d, x: x + 0.9, y: y + 0.7, w: wW - 1.15, fs: 12, color: '#C6C6CC', lh: 1.2 }));
+  p7.push(box({ text: h, x: x + 0.9, y: y + 0.26, w: wW - 1.15, fs: 16, bold: true, ff: DISP }));
+  p7.push(box({ text: d, x: x + 0.9, y: y + 0.66, w: wW - 1.15, fs: 12, color: '#C6C6CC', lh: 1.2 }));
 });
 slide('bg-content.png', p7);
 
-// S8 contact
+// 8 contact
 slide('bg-contact.png', [
-  kick("LET'S TALK  /  ДАВАЙТЕ РАБОТАТЬ", 0.9, 1.85),
-  box({ text: 'Unlock your true<br>potential.', x: 0.85, y: 2.25, w: 9, fs: 52, bold: true, lh: 1.0 }),
-  box({ text: 'Присоединяйся к AS Talent Agency — и раскрой свой потенциал вместе с нами.', x: 0.9, y: 4.2, w: 8.4, fs: 17, color: TEXT }),
-  panel(0.9, 5.15, 3.9, 0.9),
-  box({ text: 'astalentagency.com', x: 0.9, y: 5.15, w: 3.9, h: 0.9, fs: 15, bold: true, align: 'center', valign: 'middle' }),
+  kick("LET'S TALK", 0.9, 1.9),
+  box({ text: 'Unlock your true<br>potential.', x: 0.85, y: 2.3, w: 9, fs: 56, bold: true, ff: DISP, lh: 1.0 }),
+  box({ text: 'Join AS Talent Agency and unlock your true potential with us.', x: 0.9, y: 4.35, w: 8.4, fs: 17, color: TEXT }),
+  panel(0.9, 5.25, 3.9, 0.9),
+  box({ text: 'astalentagency.com', x: 0.9, y: 5.25, w: 3.9, h: 0.9, fs: 15, bold: true, align: 'center', valign: 'middle' }),
 ]);
 
 const html = `<!doctype html><html><head><meta charset="utf-8"><style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#222;font-family:Arial,Helvetica,sans-serif}
 .slide{position:relative;width:1280px;height:720px;background-size:cover;overflow:hidden;margin:0 auto 20px}
-.t{position:absolute}.s{position:absolute}.im{position:absolute}
+.t{position:absolute}.s{position:absolute}.im{position:absolute;object-fit:cover}
 </style></head><body>${slides.join('')}</body></html>`;
 fs.writeFileSync(__dirname + '/preview.html', html);
 console.log('preview.html written');
