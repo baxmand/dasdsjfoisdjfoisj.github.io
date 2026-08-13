@@ -96,34 +96,43 @@ s.addText('AS Superpowers', { x: 0.68, y: 0.75, w: 10, h: 0.8, fontFace: FONT,
   fontSize: 38, bold: true, color: WHITE, glow: glow() });
 
 const roster = [
+  { name: 'Elizabeth Anokhina', foll: '45M', img: 'av-elizabeth.png', soc: ['x', 'tiktok', 'instagram'] },
   { name: 'Eli Vasilenko', foll: '10.5M', img: 'av-eli.png', soc: ['x', 'tiktok', 'instagram'] },
   { name: 'Little Caprice', foll: '11M', img: 'av-caprice.png', soc: ['tiktok', 'instagram'] },
   { name: 'Macca', foll: '1.5M', img: 'av-macca.png', soc: ['x', 'tiktok', 'instagram'] },
   { name: 'Kuri Emi', foll: '2.5M', img: 'av-kuri.png', soc: ['x', 'tiktok', 'instagram'] },
   { name: 'Qimmah Russo', foll: '5M', img: 'av-qimmah.png', soc: ['x', 'tiktok', 'instagram'] },
   { name: 'Chloe Amour', foll: '2.4M', img: 'av-chloe.png', soc: ['x', 'tiktok', 'instagram'] },
+  { name: 'Zlata Sharvarok', foll: '1M', img: 'av-zlata.png', soc: ['x', 'tiktok', 'instagram'] },
 ];
 const icMap = { x: 'ic-x.png', tiktok: 'ic-tiktok.png', instagram: 'ic-instagram.png' };
-const cols = [2.89, 6.667, 10.44];
-const rowTop = [1.65, 4.5];
-const AV = 1.35, DIA = 0.34, GAP = 0.16, ICON = 0.19;
+const DIA = 0.30, GAP = 0.14, ICON = 0.17, AV = 1.15;
+const margin = 0.9, usable = 13.333 - 2 * margin;
+const N = roster.length, topN = Math.ceil(N / 2);
+const rowsArr = [roster.slice(0, topN), roster.slice(topN)];
+const rowTopY = [1.55, 4.35];
 
-roster.forEach((t, i) => {
-  const cx = cols[i % 3];
-  const top = rowTop[Math.floor(i / 3)];
-  s.addImage({ path: A + t.img, x: cx - AV / 2, y: top, w: AV, h: AV });
-  s.addText(t.name.toUpperCase(), { x: cx - 1.85, y: top + AV + 0.08, w: 3.7, h: 0.4,
-    fontFace: FONT, fontSize: 15, bold: true, color: PINK2, align: 'center' });
-  s.addText(t.foll + ' FOLLOWERS', { x: cx - 1.85, y: top + AV + 0.5, w: 3.7, h: 0.3,
-    fontFace: FONT, fontSize: 10.5, color: MUTE, charSpacing: 1, align: 'center' });
-  const n = t.soc.length;
-  const totalW = n * DIA + (n - 1) * GAP;
-  let ix = cx - totalW / 2;
-  const iy = top + AV + 0.86;
-  t.soc.forEach((sc) => {
-    s.addShape('ellipse', { x: ix, y: iy, w: DIA, h: DIA, fill: { color: 'F2F2F2' } });
-    s.addImage({ path: A + icMap[sc], x: ix + (DIA - ICON) / 2, y: iy + (DIA - ICON) / 2, w: ICON, h: ICON });
-    ix += DIA + GAP;
+rowsArr.forEach((items, ri) => {
+  const k = items.length;
+  const cellW = usable / k;
+  const top = rowTopY[ri];
+  items.forEach((t, ci) => {
+    const cx = margin + (ci + 0.5) * cellW;
+    s.addImage({ path: A + t.img, x: cx - AV / 2, y: top, w: AV, h: AV });
+    s.addText(t.name.toUpperCase(), { x: cx - cellW / 2, y: top + AV + 0.05, w: cellW, h: 0.5,
+      fontFace: FONT, fontSize: 13, bold: true, color: PINK2, align: 'center', valign: 'top',
+      lineSpacingMultiple: 1.0 });
+    s.addText(t.foll + ' FOLLOWERS', { x: cx - cellW / 2, y: top + AV + 0.6, w: cellW, h: 0.3,
+      fontFace: FONT, fontSize: 10, color: MUTE, charSpacing: 1, align: 'center' });
+    const n = t.soc.length;
+    const totalW = n * DIA + (n - 1) * GAP;
+    let ix = cx - totalW / 2;
+    const iy = top + AV + 0.95;
+    t.soc.forEach((sc) => {
+      s.addShape('ellipse', { x: ix, y: iy, w: DIA, h: DIA, fill: { color: 'F2F2F2' } });
+      s.addImage({ path: A + icMap[sc], x: ix + (DIA - ICON) / 2, y: iy + (DIA - ICON) / 2, w: ICON, h: ICON });
+      ix += DIA + GAP;
+    });
   });
 });
 s.addNotes('Наши топ-авторы и их суммарный охват. Присутствие на X, TikTok и Instagram.');
@@ -175,8 +184,8 @@ s.addText('Цифры', { x: 0.68, y: 0.85, w: 8, h: 0.8, fontFace: FONT, fontSi
   bold: true, color: WHITE });
 
 const stats = [
-  ['33M+', 'Combined audience', 'Суммарная аудитория'],
-  ['6', 'Top creators featured', 'Топ-авторов в подборке'],
+  ['79M+', 'Combined audience', 'Суммарная аудитория'],
+  ['8', 'Top creators featured', 'Топ-авторов в подборке'],
   ['3+', 'Years of experience', 'Года опыта'],
   ['24/7', 'Dedicated support', 'Поддержка без выходных'],
 ];
