@@ -247,9 +247,9 @@ kicker(s, 'RESULTS', 0.7, 0.55);
 title(s, 'What growth looks like', 0.9);
 s.addText('Representative first-quarter trajectory', { x: 0.72, y: 1.75, w: 8, h: 0.35, fontFace: SANS, fontSize: 13, italic: true, color: MUTE });
 const res = [
-  ['Subscribers', '9,000', 'from 2,000'],
+  ['Active paying fans', '1,200', 'from 350'],
   ['Monthly revenue', '$18k', 'from $4k'],
-  ['Fan retention', '+60%', 'vs. baseline'],
+  ['Avg revenue / fan', '$15', 'subs + PPV + tips'],
   ['Chat response', '<2 min', '24/7 coverage'],
 ];
 const reW = 2.86, reG = 0.3;

@@ -171,8 +171,8 @@ p5.push(footer(7));
 slide('bg-content.png', p5);
 
 // RESULTS
-const res = [['Subscribers', '9,000', 'from 2,000'], ['Monthly revenue', '$18k', 'from $4k'],
-['Fan retention', '+60%', 'vs. baseline'], ['Chat response', '<2 min', '24/7 coverage']];
+const res = [['Active paying fans', '1,200', 'from 350'], ['Monthly revenue', '$18k', 'from $4k'],
+['Avg revenue / fan', '$15', 'subs + PPV + tips'], ['Chat response', '<2 min', '24/7 coverage']];
 const reW = 2.86, reG = 0.3, reX = (13.333 - (4 * reW + 3 * reG)) / 2;
 let pRe = [kick('RESULTS', 0.7, 0.55), title('What growth looks like', 0.9),
   box({ text: 'Representative first-quarter trajectory', x: 0.72, y: 1.75, w: 8, fs: 13, italic: true, color: MUTE })];
