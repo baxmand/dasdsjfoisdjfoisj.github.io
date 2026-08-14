@@ -36,6 +36,9 @@ function kick(text, x, y) {
 const title = (text, y, size) => box({ text, x: 0.64, y, w: 11.5, fs: size || 44, bold: true, ff: DISP });
 const serifNum = (x, y, n) => box({ text: n, x, y, w: 1.6, fs: 44, bold: true, italic: true, color: PINK2, ff: DISP });
 const line = (x, y, w) => rect({ x, y, w, h: 0.02, fill: PINK });
+const footer = (n) => ell({ x: 0.7, y: 7.12, w: 0.08, h: 0.08, fill: PINK })
+  + box({ text: 'AS TALENT AGENCY', x: 0.9, y: 7.02, w: 5, fs: 9.5, bold: true, color: MUTE, cs: 2 })
+  + box({ text: String(n).padStart(2, '0') + '  /  13', x: 10.5, y: 7.02, w: 2.13, fs: 11, bold: true, color: PINK2, align: 'right', ff: DISP });
 const slide = (bg, parts) => slides.push(`<div class="slide" style="background-image:url('${A}${bg}')">${parts.join('')}</div>`);
 
 // 1 cover
@@ -67,6 +70,7 @@ p2.push(box({ text: 'We never ship template solutions — the strategy is built 
 p2.push(line(8.05, 5.06, 4.25));
 p2.push(box({ text: '“Within 3 months my subscriber count doubled, and my monthly income tripled.”', x: 8.05, y: 5.25, w: 4.3, fs: 13, italic: true, color: PINK2, lh: 1.2 }));
 p2.push(box({ text: '— creator testimonial', x: 8.05, y: 6.15, w: 4.3, fs: 10.5, color: MUTE }));
+p2.push(footer(2));
 slide('bg-content.png', p2);
 
 // 3 roster
@@ -112,7 +116,42 @@ sub.forEach((t, i) => {
   p4.push(ell({ x: x + 0.3, y: y + 0.24, w: 0.22, h: 0.22, fill: PINK }));
   p4.push(box({ text: t, x: x + 0.7, y, w: cW - 0.9, h: 0.72, fs: 13, bold: true, color: '#E4E4E8', valign: 'middle' }));
 });
+p4.push(footer(4));
 slide('bg-content.png', p4);
+
+// PLATFORMS
+const platforms = [['OnlyFans', 'Core monetization: subscriptions, PPV and tips.'],
+['Instagram', 'Brand funnel: Reels, stories and audience growth.'],
+['TikTok', 'Top-of-funnel reach and viral discovery.'],
+['X (Twitter)', 'NSFW-friendly promo and warm inbound traffic.'],
+['Reddit', 'Targeted community traffic straight to your page.'],
+['Fansly & more', 'Secondary platforms and backup accounts.']];
+const plW = 3.85, plGx = 0.35, plH = 1.95, plGy = 0.3, plX = (13.333 - (3 * plW + 2 * plGx)) / 2;
+let pPl = [kick('PLATFORMS', 0.7, 0.55), title('Where we grow you', 0.9)];
+platforms.forEach(([h, d], i) => {
+  const col = i % 3, row = Math.floor(i / 3), x = plX + col * (plW + plGx), y = 2.1 + row * (plH + plGy);
+  pPl.push(panel(x, y, plW, plH));
+  pPl.push(box({ text: h, x: x + 0.35, y: y + 0.3, w: plW - 0.7, fs: 20, bold: true, ff: DISP }));
+  pPl.push(line(x + 0.37, y + 0.93, 0.6));
+  pPl.push(box({ text: d, x: x + 0.35, y: y + 1.05, w: plW - 0.7, fs: 12.5, color: '#C2C2C8', lh: 1.25 }));
+});
+pPl.push(footer(5));
+slide('bg-content.png', pPl);
+
+// WHAT'S INCLUDED
+const incl = ['Account setup & optimization', 'Content strategy & scheduling', '24/7 chatting & sales',
+  'PPV & upsell campaigns', 'Fan retention & win-back', 'Social media growth', 'Paid promo & shoutouts',
+  'Analytics & weekly reporting', 'Persona & brand development', 'Compliance & account safety'];
+const inColX = [0.9, 6.95], inStartY = 2.15, inStep = 0.86;
+let pIn = [kick('FULL SERVICE', 0.7, 0.55), title("What's included", 0.9)];
+incl.forEach((t, i) => {
+  const col = Math.floor(i / 5), row = i % 5, x = inColX[col], y = inStartY + row * inStep;
+  pIn.push(ell({ x, y, w: 0.4, h: 0.4, fill: PINK }));
+  pIn.push(box({ text: '✓', x, y, w: 0.4, h: 0.4, fs: 14, bold: true, color: WHITE, align: 'center', valign: 'middle' }));
+  pIn.push(box({ text: t, x: x + 0.6, y: y - 0.05, w: 5.0, h: 0.5, fs: 15.5, bold: true, color: TEXT, valign: 'middle' }));
+});
+pIn.push(footer(6));
+slide('bg-content.png', pIn);
 
 // 5 numbers
 const stats = [['150+', 'Creators on roster'], ['3+', 'Years of experience'], ['24/7', 'Dedicated support'], ['Global', 'Talent worldwide']];
@@ -128,7 +167,25 @@ const fW = 4 * nW + 3 * nGap;
 p5.push(panel(nX, 5.05, fW, 1.3));
 p5.push(box({ text: '“Within 3 months my subscriber count doubled, and my monthly income tripled.”', x: nX + 0.5, y: 5.2, w: fW - 1.0, fs: 18, bold: true, italic: true, align: 'center', ff: DISP }));
 p5.push(box({ text: '— creator testimonial', x: nX + 0.5, y: 5.85, w: fW - 1.0, fs: 12, color: PINK2, align: 'center' }));
+p5.push(footer(7));
 slide('bg-content.png', p5);
+
+// RESULTS
+const res = [['Subscribers', '9,000', 'from 2,000'], ['Monthly revenue', '$18k', 'from $4k'],
+['Fan retention', '+60%', 'vs. baseline'], ['Chat response', '<2 min', '24/7 coverage']];
+const reW = 2.86, reG = 0.3, reX = (13.333 - (4 * reW + 3 * reG)) / 2;
+let pRe = [kick('RESULTS', 0.7, 0.55), title('What growth looks like', 0.9),
+  box({ text: 'Representative first-quarter trajectory', x: 0.72, y: 1.75, w: 8, fs: 13, italic: true, color: MUTE })];
+res.forEach(([lab, big, sub], i) => {
+  const x = reX + i * (reW + reG), y = 2.35;
+  pRe.push(panel(x, y, reW, 2.45));
+  pRe.push(box({ text: lab.toUpperCase(), x, y: y + 0.35, w: reW, fs: 11, bold: true, color: MUTE, align: 'center', cs: 1 }));
+  pRe.push(box({ text: big, x, y: y + 0.78, w: reW, fs: 44, bold: true, color: PINK2, align: 'center', ff: DISP }));
+  pRe.push(box({ text: sub, x, y: y + 1.82, w: reW, fs: 12, color: '#C2C2C8', align: 'center' }));
+});
+pRe.push(box({ text: 'Representative example based on typical outcomes — actual results vary by creator and niche.', x: reX, y: 5.1, w: 4 * reW + 3 * reG, fs: 11.5, italic: true, color: MUTE, align: 'center' }));
+pRe.push(footer(8));
+slide('bg-content.png', pRe);
 
 // 6 process
 const steps = [['Onboarding', 'We learn the creator, brand and goals, and assign a dedicated manager.'],
@@ -146,7 +203,45 @@ steps.forEach(([en, d], i) => {
   p6.push(box({ text: d, x: x + 0.35, y: y + 2.05, w: pW - 0.7, fs: 12.5, color: '#C2C2C8', lh: 1.28 }));
   if (i < 3) p6.push(box({ text: '→', x: x + pW - 0.02, y: y + 1.35, w: pGap + 0.04, fs: 20, bold: true, color: PINK2, align: 'center' }));
 });
+p6.push(footer(9));
 slide('bg-content.png', p6);
+
+// THE TEAM
+const team = [['Account Managers', 'Own the strategy and day-to-day for each creator.'],
+['OnlyFans Chatters', 'Convert and retain fans with 24/7 sales.'],
+['Social Media Managers', 'Grow Instagram, TikTok and X audiences.'],
+['Content Producers', 'Plan, shoot and edit premium content.'],
+['Marketing & Traffic', 'Paid promo, shoutouts and funnels.'],
+['Data Analysts', 'Track performance and optimize revenue.']];
+const tmW = 3.85, tmGx = 0.35, tmH = 1.6, tmGy = 0.3, tmX = (13.333 - (3 * tmW + 2 * tmGx)) / 2;
+let pTm = [kick('THE TEAM', 0.7, 0.55), title('Behind the scenes', 0.9)];
+team.forEach(([h, d], i) => {
+  const col = i % 3, row = Math.floor(i / 3), x = tmX + col * (tmW + tmGx), y = 2.15 + row * (tmH + tmGy);
+  pTm.push(panel(x, y, tmW, tmH));
+  pTm.push(box({ text: h, x: x + 0.32, y: y + 0.26, w: tmW - 0.6, fs: 16, bold: true, ff: DISP }));
+  pTm.push(line(x + 0.34, y + 0.78, 0.5));
+  pTm.push(box({ text: d, x: x + 0.32, y: y + 0.88, w: tmW - 0.6, fs: 12, color: '#C6C6CC', lh: 1.2 }));
+});
+pTm.push(footer(10));
+slide('bg-content.png', pTm);
+
+// HOW WE PARTNER
+const part = [['Performance-based', 'We earn when you earn — our commission is tied directly to your results.'],
+['No upfront cost', 'No setup or subscription fees. We invest in your growth from day one.'],
+['Flexible & confidential', 'Custom terms, exclusivity options and full discretion, always.']];
+const paW = 3.85, paGap = 0.35, paX = (13.333 - (3 * paW + 2 * paGap)) / 2;
+let pPa = [kick('PARTNERSHIP', 0.7, 0.55), title('How we partner', 0.9)];
+part.forEach(([h, d], i) => {
+  const x = paX + i * (paW + paGap), y = 2.15;
+  pPa.push(panel(x, y, paW, 3.05));
+  pPa.push(serifNum(x + 0.33, y + 0.28, '0' + (i + 1)));
+  pPa.push(line(x + 0.35, y + 1.28, 0.6));
+  pPa.push(box({ text: h, x: x + 0.35, y: y + 1.42, w: paW - 0.7, fs: 19, bold: true, ff: DISP }));
+  pPa.push(box({ text: d, x: x + 0.35, y: y + 2.08, w: paW - 0.7, fs: 12.5, color: '#C2C2C8', lh: 1.22 }));
+});
+pPa.push(box({ text: 'Commission is tailored to your tier and platform mix. Ask us for a custom proposal.', x: paX, y: 5.5, w: 3 * paW + 2 * paGap, fs: 12.5, italic: true, color: MUTE, align: 'center' }));
+pPa.push(footer(11));
+slide('bg-content.png', pPa);
 
 // 7 why
 const why = [['Dedicated manager', 'A personal manager and onboarding for every client.'],
@@ -165,6 +260,7 @@ why.forEach(([h, d], i) => {
   p7.push(box({ text: h, x: x + 0.9, y: y + 0.26, w: wW - 1.15, fs: 16, bold: true, ff: DISP }));
   p7.push(box({ text: d, x: x + 0.9, y: y + 0.66, w: wW - 1.15, fs: 12, color: '#C6C6CC', lh: 1.2 }));
 });
+p7.push(footer(12));
 slide('bg-content.png', p7);
 
 // 8 contact
