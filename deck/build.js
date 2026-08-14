@@ -38,7 +38,7 @@ function serifNum(s, x, y, n) {
 function footer(s, n) {
   s.addShape('ellipse', { x: 0.7, y: 7.12, w: 0.08, h: 0.08, fill: { color: PINK } });
   s.addText('AS TALENT AGENCY', { x: 0.9, y: 7.02, w: 5, h: 0.3, fontFace: SANS, fontSize: 9.5, bold: true, color: MUTE, charSpacing: 2 });
-  s.addText(String(n).padStart(2, '0') + '  /  13', { x: 10.5, y: 7.02, w: 2.13, h: 0.3, fontFace: DISP, fontSize: 11, bold: true, color: PINK2, align: 'right' });
+  s.addText(String(n).padStart(2, '0') + '  /  14', { x: 10.5, y: 7.02, w: 2.13, h: 0.3, fontFace: DISP, fontSize: 11, bold: true, color: PINK2, align: 'right' });
 }
 
 // ==================================================== 1 — COVER
@@ -48,7 +48,7 @@ kicker(s, 'TALENT  ·  SOCIAL MEDIA  ·  ONLYFANS', 0.9, 1.35);
 s.addText('AS Talent Agency', { x: 0.85, y: 1.85, w: 11.5, h: 1.5, fontFace: DISP, fontSize: 70, bold: true, color: WHITE });
 s.addText([
   { text: 'AS Superpowers', options: { color: PINK2 } },
-  { text: '  —  a premium creator management house', options: { color: MUTE } },
+  { text: '  —  a premium worldwide OnlyFans agency', options: { color: MUTE } },
 ], { x: 0.9, y: 3.25, w: 11.5, h: 0.6, fontFace: SANS, fontSize: 20, bold: true });
 s.addText('We manage talent, social media and OnlyFans, around the clock —\nso creators can focus on what they do best.',
   { x: 0.9, y: 4.15, w: 8.6, h: 1.0, fontFace: SANS, fontSize: 17, color: TEXT, lineSpacingMultiple: 1.3 });
@@ -87,9 +87,9 @@ s.addText('“No two creators\nare alike.”', { x: 8.05, y: 2.4, w: 4.3, h: 1.3
 s.addText('We never ship template solutions — the strategy is built around each creator’s brand and goals.',
   { x: 8.05, y: 3.9, w: 4.3, h: 1.0, fontFace: SANS, fontSize: 13.5, color: 'BEBEC4', lineSpacingMultiple: 1.25 });
 s.addShape('line', { x: 8.05, y: 5.05, w: 4.25, h: 0, line: { color: HAIR, width: 0.75, transparency: 82 } });
-s.addText('“Within 3 months my subscriber count doubled, and my monthly income tripled.”',
+s.addText('“I get much more free time and income — they put so much effort in their work.”',
   { x: 8.05, y: 5.25, w: 4.3, h: 0.9, fontFace: SANS, fontSize: 13, italic: true, color: PINK2, lineSpacingMultiple: 1.2 });
-s.addText('— creator testimonial', { x: 8.05, y: 6.15, w: 4.3, h: 0.3, fontFace: SANS, fontSize: 10.5, color: MUTE });
+s.addText('— Valentine, AS creator', { x: 8.05, y: 6.15, w: 4.3, h: 0.3, fontFace: SANS, fontSize: 10.5, color: MUTE });
 footer(s, 2);
 s.addNotes('Who we are: full-cycle agency, 3+ years, personalized approach, global roster.');
 
@@ -98,7 +98,7 @@ s = p.addSlide();
 s.background = { path: A + 'bg-content.png' };
 kicker(s, 'OUR TALENT', 0.7, 0.5);
 title(s, 'The Roster', 0.8, 40);
-s.addText('FEATURED SELECTION\nPart of a 150+ creator roster', { x: 7.6, y: 0.92, w: 4.8, h: 0.7,
+s.addText('FEATURED SELECTION\nPart of a 120-creator roster', { x: 7.6, y: 0.92, w: 4.8, h: 0.7,
   fontFace: SANS, fontSize: 11.5, bold: true, color: MUTE, align: 'right', charSpacing: 0.5, lineSpacingMultiple: 1.2 });
 
 const roster = [
@@ -134,9 +134,9 @@ kicker(s, 'WHAT WE DO', 0.7, 0.55);
 title(s, 'What we do', 0.9);
 
 const services = [
-  ['24/7 OnlyFans Coverage', 'Round-the-clock OnlyFans operations: chatting, sales, retention and upsells. A dedicated manager for every creator.'],
-  ['Social Media Management', 'Growing and optimizing Instagram, TikTok and X: content plan, traffic and audience growth.'],
-  ['Content Houses', 'Shoots and production in our content houses: ideas, quality control and a steady content flow.'],
+  ['OnlyFans Account Management', 'Account audit, strategy, performance and chat-quality monitoring with real-time metrics.'],
+  ['Model Marketing', 'Viral content and collaborations across a 50M+ follower network, on every platform.'],
+  ['Profit Growth', 'Revenue strategies, profit maximization and cash-flow organization — while you stay creative.'],
 ];
 const cW = 3.85, cH = 3.15, cGap = 0.35;
 const sX = (13.333 - (3 * cW + 2 * cGap)) / 2;
@@ -148,7 +148,7 @@ services.forEach(([h, d], i) => {
   s.addText(h, { x: x + 0.35, y: y + 1.42, w: cW - 0.7, h: 0.8, fontFace: DISP, fontSize: 19, bold: true, color: WHITE, valign: 'top', lineSpacingMultiple: 1.0 });
   s.addText(d, { x: x + 0.35, y: y + 2.2, w: cW - 0.7, h: 0.9, fontFace: SANS, fontSize: 12.5, color: 'C2C2C8', valign: 'top', lineSpacingMultiple: 1.22 });
 });
-const sub = ['Chatting & Sales', 'Content Planning', 'Analytics & Growth'];
+const sub = ['24/7 Chatting & Sales', 'Content Houses', 'Analytics & Reporting'];
 sub.forEach((t, i) => {
   const x = sX + i * (cW + cGap), y = 5.55;
   panel(s, x, y, cW, 0.72, CARD2);
@@ -219,10 +219,10 @@ kicker(s, 'BY THE NUMBERS', 0.7, 0.55);
 title(s, 'By the numbers', 0.9);
 
 const stats = [
-  ['150+', 'Creators on roster'],
-  ['3+', 'Years of experience'],
-  ['24/7', 'Dedicated support'],
-  ['Global', 'Talent worldwide'],
+  ['$13M', 'Agency revenue'],
+  ['120', 'Creators managed'],
+  ['150+', 'Staff worldwide'],
+  ['50M+', 'Combined reach'],
 ];
 const nW = 2.86, nGap = 0.3;
 const nX = (13.333 - (4 * nW + 3 * nGap)) / 2;
@@ -233,10 +233,11 @@ stats.forEach(([big, en], i) => {
   s.addText(en, { x, y: y + 1.6, w: nW, h: 0.4, fontFace: SANS, fontSize: 14, bold: true, color: WHITE, align: 'center' });
 });
 const fW = 4 * nW + 3 * nGap;
-panel(s, nX, 5.05, fW, 1.3, CARD);
-s.addText('“Within 3 months my subscriber count doubled, and my monthly income tripled.”',
-  { x: nX + 0.5, y: 5.2, w: fW - 1.0, h: 0.6, fontFace: DISP, fontSize: 18, bold: true, italic: true, color: WHITE, align: 'center' });
-s.addText('— creator testimonial', { x: nX + 0.5, y: 5.85, w: fW - 1.0, h: 0.35, fontFace: SANS, fontSize: 12, color: PINK2, align: 'center' });
+s.addText('3 years operating  ·  offices in the USA, Dubai, Poland & Cyprus', { x: nX, y: 4.62, w: fW, h: 0.3, fontFace: SANS, fontSize: 12.5, bold: true, color: MUTE, align: 'center', charSpacing: 0.5 });
+panel(s, nX, 5.1, fW, 1.25, CARD);
+s.addText('“I get much more free time and income — they put so much effort in their work.”',
+  { x: nX + 0.5, y: 5.24, w: fW - 1.0, h: 0.6, fontFace: DISP, fontSize: 18, bold: true, italic: true, color: WHITE, align: 'center' });
+s.addText('— Valentine, AS creator', { x: nX + 0.5, y: 5.86, w: fW - 1.0, h: 0.35, fontFace: SANS, fontSize: 12, color: PINK2, align: 'center' });
 footer(s, 7);
 s.addNotes('Key numbers and social proof.');
 
@@ -245,28 +246,27 @@ s = p.addSlide();
 s.background = { path: A + 'bg-content.png' };
 kicker(s, 'RESULTS', 0.7, 0.55);
 title(s, 'What growth looks like', 0.9);
-s.addText("One creator's first months with AS — before vs. after", { x: 0.72, y: 1.75, w: 9, h: 0.35, fontFace: SANS, fontSize: 13, italic: true, color: MUTE });
-const res = [
-  ['Monthly revenue', '$101k', 'from $50k'],
-  ['Revenue growth', '2×', 'in 3 months'],
-  ['Extra / month', '+$51k', 'net uplift'],
-  ['Chat response', '<2 min', '24/7 coverage'],
+s.addText('From a first OnlyFans launch to scaling an established page — we grow creators at every stage.',
+  { x: 0.72, y: 1.72, w: 11.6, h: 0.4, fontFace: SANS, fontSize: 13, italic: true, color: MUTE });
+const cases = [
+  ['Fresh launch', 'New to OnlyFans · ~400k on Instagram', '$0', '$38k / mo', 'in 4 months'],
+  ['Scaling up', 'Established creator, already earning', '$50k', '$101k / mo', '2× in 3 months'],
 ];
-const reW = 2.86, reG = 0.3;
-const reX = (13.333 - (4 * reW + 3 * reG)) / 2;
-res.forEach(([lab, big, sub], i) => {
-  const x = reX + i * (reW + reG), y = 2.35;
-  panel(s, x, y, reW, 2.45, CARD);
-  s.addText(lab.toUpperCase(), { x, y: y + 0.35, w: reW, h: 0.3, fontFace: SANS, fontSize: 11, bold: true, color: MUTE, align: 'center', charSpacing: 1 });
-  s.addText(big, { x, y: y + 0.78, w: reW, h: 0.9, fontFace: DISP, fontSize: 44, bold: true, color: PINK2, align: 'center' });
-  s.addText(sub, { x, y: y + 1.82, w: reW, h: 0.35, fontFace: SANS, fontSize: 12, color: 'C2C2C8', align: 'center' });
+cases.forEach(([label, ctx, before, after, note], i) => {
+  const y = 2.25 + i * 2.0;
+  panel(s, 0.7, y, 11.93, 1.75, CARD);
+  s.addText(label, { x: 1.15, y: y + 0.3, w: 3.7, h: 0.45, fontFace: DISP, fontSize: 20, bold: true, color: WHITE });
+  s.addText(ctx, { x: 1.15, y: y + 0.86, w: 3.95, h: 0.7, fontFace: SANS, fontSize: 12, color: 'C2C2C8', valign: 'top', lineSpacingMultiple: 1.2 });
+  s.addText([
+    { text: before + '     ', options: { color: MUTE } },
+    { text: '→', options: { color: PINK } },
+    { text: '     ' + after, options: { color: PINK2 } },
+  ], { x: 5.1, y: y + 0.45, w: 5.2, h: 0.85, fontFace: DISP, fontSize: 32, bold: true, align: 'center', valign: 'middle' });
+  s.addText(note, { x: 10.1, y: y + 0.45, w: 2.0, h: 0.85, fontFace: SANS, fontSize: 13, bold: true, color: WHITE, align: 'right', valign: 'middle' });
 });
-s.addText('Dec $50k   →   Jan $82k   →   Feb $85k   →   Mar $101k',
-  { x: reX, y: 5.08, w: 4 * reW + 3 * reG, h: 0.4, fontFace: SANS, fontSize: 14.5, bold: true, color: PINK2, align: 'center' });
-s.addText('Individual results; not a guarantee.',
-  { x: reX, y: 5.6, w: 4 * reW + 3 * reG, h: 0.3, fontFace: SANS, fontSize: 10.5, italic: true, color: MUTE, align: 'center' });
+s.addText('Individual results; not a guarantee.', { x: 0.7, y: 6.25, w: 11.93, h: 0.3, fontFace: SANS, fontSize: 10.5, italic: true, color: MUTE, align: 'center' });
 footer(s, 8);
-s.addNotes('Representative growth example. Replace with real client numbers where available.');
+s.addNotes('Range of outcomes: launching a fresh creator from zero and scaling an established one.');
 
 // ==================================================== 6 — HOW WE WORK
 s = p.addSlide();
@@ -299,6 +299,7 @@ s = p.addSlide();
 s.background = { path: A + 'bg-content.png' };
 kicker(s, 'THE TEAM', 0.7, 0.55);
 title(s, 'Behind the scenes', 0.9);
+s.addText('150+ specialists across the USA, Dubai, Poland and Cyprus.', { x: 0.72, y: 1.75, w: 11, h: 0.35, fontFace: SANS, fontSize: 13, italic: true, color: MUTE });
 const team = [
   ['Account Managers', 'Own the strategy and day-to-day for each creator.'],
   ['OnlyFans Chatters', 'Convert and retain fans with 24/7 sales.'],
@@ -352,12 +353,12 @@ kicker(s, 'WHY AS TALENT', 0.7, 0.55);
 title(s, 'Why AS Talent', 0.9);
 
 const why = [
-  ['Dedicated manager', 'A personal manager and onboarding for every client.'],
-  ['24/7 support', 'A support team available around the clock.'],
-  ['Data-driven', 'Decisions based on analytics and performance metrics.'],
-  ['Creative freedom', 'You create the content — we run the business.'],
-  ['All levels welcome', 'We work with creators at any level, from start to top.'],
-  ['Global reach', 'Models and influencers worldwide, men and women.'],
+  ['Personalized approach', 'A tailored strategy and dedicated manager for every creator.'],
+  ['Expert marketing', 'Viral content across a 50M+ follower network.'],
+  ['Extensive support', 'A full team on your account, available 24/7.'],
+  ['Lucrative earnings', 'Revenue and profit maximization, done for you.'],
+  ['Collaborations', 'Cross-promotion across our worldwide talent pool.'],
+  ['Global reach', 'Offices in the USA, Dubai, Poland & Cyprus.'],
 ];
 const wW = 3.85, wGx = 0.35, wH = 1.5, wGy = 0.3;
 const wX = (13.333 - (3 * wW + 2 * wGx)) / 2;
@@ -373,15 +374,51 @@ why.forEach(([h, d], i) => {
 footer(s, 12);
 s.addNotes('Why AS Talent — key advantages.');
 
+// ==================================================== CONTENT HOUSES
+s = p.addSlide();
+s.background = { path: A + 'bg-content.png' };
+kicker(s, 'CONTENT HOUSES', 0.7, 0.55);
+title(s, 'Inside our content houses', 0.9);
+s.addText('From coastal villas to alpine sets — real production locations, shot by our in-house crew.',
+  { x: 0.72, y: 1.72, w: 11.6, h: 0.4, fontFace: SANS, fontSize: 13, italic: true, color: MUTE });
+const houses = [
+  ['p-house-coast.png', 'Coastal villa', 'Infinity pool · sea views'],
+  ['p-house-snow.png', 'Alpine set', 'On-location editorial'],
+  ['p-house-villa.png', 'Poolside villa', 'Full production crew'],
+  ['p-house-pool.png', 'Group shoots', 'Multi-creator sets'],
+];
+const hoW = 2.86, hoGap = 0.3, hoH = 3.27;
+const hoX = (13.333 - (4 * hoW + 3 * hoGap)) / 2;
+houses.forEach(([img, name, cap], i) => {
+  const x = hoX + i * (hoW + hoGap), y = 2.3;
+  s.addImage({ path: A + img, x, y, w: hoW, h: hoH });
+  s.addShape('roundRect', { x, y, w: hoW, h: hoH, rectRadius: 0.14, fill: { color: 'FFFFFF', transparency: 100 }, line: { color: PINK, width: 1, transparency: 45 } });
+  s.addText(name, { x: x + 0.2, y: y + hoH - 0.7, w: hoW - 0.4, h: 0.4, fontFace: DISP, fontSize: 17, bold: true, color: WHITE, valign: 'bottom' });
+  s.addText(cap.toUpperCase(), { x: x + 0.2, y: y + hoH - 0.32, w: hoW - 0.4, h: 0.26, fontFace: SANS, fontSize: 8.5, bold: true, color: PINK2, charSpacing: 1 });
+});
+footer(s, 13);
+s.addNotes('Real production locations from our content houses: coastal, alpine, poolside, group sets.');
+
 // ==================================================== 8 — CONTACT
 s = p.addSlide();
 s.background = { path: A + 'bg-contact.png' };
 kicker(s, "LET'S TALK", 0.9, 1.9);
 s.addText('Unlock your true\npotential.', { x: 0.85, y: 2.3, w: 9, h: 1.9, fontFace: DISP, fontSize: 56, bold: true, color: WHITE, lineSpacingMultiple: 1.0 });
-s.addText('Join AS Talent Agency and unlock your true potential with us.',
-  { x: 0.9, y: 4.35, w: 8.4, h: 0.6, fontFace: SANS, fontSize: 17, color: TEXT });
-panel(s, 0.9, 5.25, 3.9, 0.9, CARD);
-s.addText('astalentagency.com', { x: 0.9, y: 5.25, w: 3.9, h: 0.9, fontFace: SANS, fontSize: 15, bold: true, color: WHITE, align: 'center', valign: 'middle' });
-s.addNotes('Contact and call to action. astalentagency.com');
+s.addText('Join AS Talent Agency and grow with a team that lives on your results.',
+  { x: 0.9, y: 4.3, w: 8.4, h: 0.6, fontFace: SANS, fontSize: 17, color: TEXT });
+const contacts = [
+  ['Telegram', '@AS_Agency'],
+  ['WhatsApp', '+1 (646) 596 6014'],
+  ['Instagram', '@as.talentagency'],
+];
+const ctW = 3.63, ctGap = 0.35;
+contacts.forEach(([lab, val], i) => {
+  const x = 0.9 + i * (ctW + ctGap), y = 5.15;
+  panel(s, x, y, ctW, 0.98, CARD);
+  s.addText(lab.toUpperCase(), { x: x + 0.3, y: y + 0.17, w: ctW - 0.6, h: 0.25, fontFace: SANS, fontSize: 9.5, bold: true, color: MUTE, charSpacing: 1.5 });
+  s.addText(val, { x: x + 0.3, y: y + 0.44, w: ctW - 0.6, h: 0.4, fontFace: SANS, fontSize: 15, bold: true, color: PINK2 });
+});
+s.addText('astalentagency.com     ·     AS@ADSTARS.CLUB', { x: 0.9, y: 6.5, w: 11, h: 0.35, fontFace: SANS, fontSize: 13, bold: true, color: WHITE });
+s.addNotes('Contacts: Telegram @AS_Agency, WhatsApp +1 646 596 6014, Instagram @as.talentagency, AS@ADSTARS.CLUB, astalentagency.com');
 
 p.writeFile({ fileName: __dirname + '/AS-Talent-Agency.pptx' }).then(f => console.log('saved', f));

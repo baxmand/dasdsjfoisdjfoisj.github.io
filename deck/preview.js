@@ -38,14 +38,14 @@ const serifNum = (x, y, n) => box({ text: n, x, y, w: 1.6, fs: 44, bold: true, i
 const line = (x, y, w) => rect({ x, y, w, h: 0.02, fill: PINK });
 const footer = (n) => ell({ x: 0.7, y: 7.12, w: 0.08, h: 0.08, fill: PINK })
   + box({ text: 'AS TALENT AGENCY', x: 0.9, y: 7.02, w: 5, fs: 9.5, bold: true, color: MUTE, cs: 2 })
-  + box({ text: String(n).padStart(2, '0') + '  /  13', x: 10.5, y: 7.02, w: 2.13, fs: 11, bold: true, color: PINK2, align: 'right', ff: DISP });
+  + box({ text: String(n).padStart(2, '0') + '  /  14', x: 10.5, y: 7.02, w: 2.13, fs: 11, bold: true, color: PINK2, align: 'right', ff: DISP });
 const slide = (bg, parts) => slides.push(`<div class="slide" style="background-image:url('${A}${bg}')">${parts.join('')}</div>`);
 
 // 1 cover
 slide('bg-cover.png', [
   kick('TALENT  ·  SOCIAL MEDIA  ·  ONLYFANS', 0.9, 1.35),
   box({ text: 'AS Talent Agency', x: 0.85, y: 1.85, w: 11.5, fs: 70, bold: true, ff: DISP }),
-  box({ text: `<span style="color:${PINK2}">AS Superpowers</span><span style="color:${MUTE}">  —  a premium creator management house</span>`, x: 0.9, y: 3.25, w: 11.5, fs: 20, bold: true }),
+  box({ text: `<span style="color:${PINK2}">AS Superpowers</span><span style="color:${MUTE}">  —  a premium worldwide OnlyFans agency</span>`, x: 0.9, y: 3.25, w: 11.5, fs: 20, bold: true }),
   box({ text: 'We manage talent, social media and OnlyFans, around the clock —<br>so creators can focus on what they do best.', x: 0.9, y: 4.15, w: 8.6, fs: 17, color: TEXT, lh: 1.3 }),
   box({ text: 'astalentagency.com', x: 0.9, y: 6.7, w: 5, fs: 14, bold: true }),
   box({ text: 'OnlyFans · Instagram · TikTok · X', x: 7.4, y: 6.7, w: 5.0, fs: 12, bold: true, color: MUTE, align: 'right', cs: 1 }),
@@ -68,8 +68,8 @@ p2.push(panel(7.7, 2.0, 4.95, 4.55));
 p2.push(box({ text: '“No two creators<br>are alike.”', x: 8.05, y: 2.4, w: 4.3, fs: 29, bold: true, ff: DISP, lh: 1.05 }));
 p2.push(box({ text: 'We never ship template solutions — the strategy is built around each creator’s brand and goals.', x: 8.05, y: 3.9, w: 4.3, fs: 13.5, color: '#BEBEC4', lh: 1.25 }));
 p2.push(line(8.05, 5.06, 4.25));
-p2.push(box({ text: '“Within 3 months my subscriber count doubled, and my monthly income tripled.”', x: 8.05, y: 5.25, w: 4.3, fs: 13, italic: true, color: PINK2, lh: 1.2 }));
-p2.push(box({ text: '— creator testimonial', x: 8.05, y: 6.15, w: 4.3, fs: 10.5, color: MUTE }));
+p2.push(box({ text: '“I get much more free time and income — they put so much effort in their work.”', x: 8.05, y: 5.25, w: 4.3, fs: 13, italic: true, color: PINK2, lh: 1.2 }));
+p2.push(box({ text: '— Valentine, AS creator', x: 8.05, y: 6.15, w: 4.3, fs: 10.5, color: MUTE }));
 p2.push(footer(2));
 slide('bg-content.png', p2);
 
@@ -85,7 +85,7 @@ const roster = [
   ['Zlata Sharvarok', '1M followers', 'p-zlata.png']];
 const mgn = 0.55, gap = 0.28, cardW = (13.333 - 2 * mgn - 3 * gap) / 4, rowY = [1.62, 4.58];
 let p3 = [kick('OUR TALENT', 0.7, 0.5), title('The Roster', 0.8, 40),
-  box({ text: 'FEATURED SELECTION<br>Part of a 150+ creator roster', x: 7.6, y: 0.92, w: 4.8, fs: 11.5, bold: true, color: MUTE, align: 'right', cs: 0.5, lh: 1.2 })];
+  box({ text: 'FEATURED SELECTION<br>Part of a 120-creator roster', x: 7.6, y: 0.92, w: 4.8, fs: 11.5, bold: true, color: MUTE, align: 'right', cs: 0.5, lh: 1.2 })];
 roster.forEach((t, i) => {
   const col = i % 4, row = Math.floor(i / 4), x = mgn + col * (cardW + gap), y = rowY[row];
   p3.push(img({ src: t[2], x, y, w: cardW, h: cardW, r: 0.16 }));
@@ -96,9 +96,9 @@ roster.forEach((t, i) => {
 slide('bg-content.png', p3);
 
 // 4 services
-const services = [['24/7 OnlyFans Coverage', 'Round-the-clock OnlyFans operations: chatting, sales, retention and upsells. A dedicated manager for every creator.'],
-['Social Media Management', 'Growing and optimizing Instagram, TikTok and X: content plan, traffic and audience growth.'],
-['Content Houses', 'Shoots and production in our content houses: ideas, quality control and a steady content flow.']];
+const services = [['OnlyFans Account Management', 'Account audit, strategy, performance and chat-quality monitoring with real-time metrics.'],
+['Model Marketing', 'Viral content and collaborations across a 50M+ follower network, on every platform.'],
+['Profit Growth', 'Revenue strategies, profit maximization and cash-flow organization — while you stay creative.']];
 const cW = 3.85, cH = 3.15, cGap = 0.35, sX = (13.333 - (3 * cW + 2 * cGap)) / 2;
 let p4 = [kick('WHAT WE DO', 0.7, 0.55), title('What we do', 0.9)];
 services.forEach(([h, d], i) => {
@@ -109,7 +109,7 @@ services.forEach(([h, d], i) => {
   p4.push(box({ text: h, x: x + 0.35, y: y + 1.42, w: cW - 0.7, fs: 19, bold: true, ff: DISP }));
   p4.push(box({ text: d, x: x + 0.35, y: y + 2.2, w: cW - 0.7, fs: 12.5, color: '#C2C2C8', lh: 1.22 }));
 });
-const sub = ['Chatting & Sales', 'Content Planning', 'Analytics & Growth'];
+const sub = ['24/7 Chatting & Sales', 'Content Houses', 'Analytics & Reporting'];
 sub.forEach((t, i) => {
   const x = sX + i * (cW + cGap), y = 5.55;
   p4.push(panel(x, y, cW, 0.72, CARD2));
@@ -154,7 +154,7 @@ pIn.push(footer(6));
 slide('bg-content.png', pIn);
 
 // 5 numbers
-const stats = [['150+', 'Creators on roster'], ['3+', 'Years of experience'], ['24/7', 'Dedicated support'], ['Global', 'Talent worldwide']];
+const stats = [['$13M', 'Agency revenue'], ['120', 'Creators managed'], ['150+', 'Staff worldwide'], ['50M+', 'Combined reach']];
 const nW = 2.86, nGap = 0.3, nX = (13.333 - (4 * nW + 3 * nGap)) / 2;
 let p5 = [kick('BY THE NUMBERS', 0.7, 0.55), title('By the numbers', 0.9)];
 stats.forEach(([big, en], i) => {
@@ -164,27 +164,29 @@ stats.forEach(([big, en], i) => {
   p5.push(box({ text: en, x, y: y + 1.6, w: nW, fs: 14, bold: true, align: 'center' }));
 });
 const fW = 4 * nW + 3 * nGap;
-p5.push(panel(nX, 5.05, fW, 1.3));
-p5.push(box({ text: '“Within 3 months my subscriber count doubled, and my monthly income tripled.”', x: nX + 0.5, y: 5.2, w: fW - 1.0, fs: 18, bold: true, italic: true, align: 'center', ff: DISP }));
-p5.push(box({ text: '— creator testimonial', x: nX + 0.5, y: 5.85, w: fW - 1.0, fs: 12, color: PINK2, align: 'center' }));
+p5.push(box({ text: '3 years operating  ·  offices in the USA, Dubai, Poland & Cyprus', x: nX, y: 4.62, w: fW, fs: 12.5, bold: true, color: MUTE, align: 'center', cs: 0.5 }));
+p5.push(panel(nX, 5.1, fW, 1.25));
+p5.push(box({ text: '“I get much more free time and income — they put so much effort in their work.”', x: nX + 0.5, y: 5.24, w: fW - 1.0, fs: 18, bold: true, italic: true, align: 'center', ff: DISP }));
+p5.push(box({ text: '— Valentine, AS creator', x: nX + 0.5, y: 5.86, w: fW - 1.0, fs: 12, color: PINK2, align: 'center' }));
 p5.push(footer(7));
 slide('bg-content.png', p5);
 
 // RESULTS
-const res = [['Monthly revenue', '$101k', 'from $50k'], ['Revenue growth', '2×', 'in 3 months'],
-['Extra / month', '+$51k', 'net uplift'], ['Chat response', '<2 min', '24/7 coverage']];
-const reW = 2.86, reG = 0.3, reX = (13.333 - (4 * reW + 3 * reG)) / 2;
+const rcases = [
+  ['Fresh launch', 'New to OnlyFans · ~400k on Instagram', '$0', '$38k / mo', 'in 4 months'],
+  ['Scaling up', 'Established creator, already earning', '$50k', '$101k / mo', '2× in 3 months'],
+];
 let pRe = [kick('RESULTS', 0.7, 0.55), title('What growth looks like', 0.9),
-  box({ text: "One creator's first months with AS — before vs. after", x: 0.72, y: 1.75, w: 9, fs: 13, italic: true, color: MUTE })];
-res.forEach(([lab, big, sub], i) => {
-  const x = reX + i * (reW + reG), y = 2.35;
-  pRe.push(panel(x, y, reW, 2.45));
-  pRe.push(box({ text: lab.toUpperCase(), x, y: y + 0.35, w: reW, fs: 11, bold: true, color: MUTE, align: 'center', cs: 1 }));
-  pRe.push(box({ text: big, x, y: y + 0.78, w: reW, fs: 44, bold: true, color: PINK2, align: 'center', ff: DISP }));
-  pRe.push(box({ text: sub, x, y: y + 1.82, w: reW, fs: 12, color: '#C2C2C8', align: 'center' }));
+  box({ text: 'From a first OnlyFans launch to scaling an established page — we grow creators at every stage.', x: 0.72, y: 1.72, w: 11.6, fs: 13, italic: true, color: MUTE })];
+rcases.forEach(([label, ctx, before, after, note], i) => {
+  const y = 2.25 + i * 2.0;
+  pRe.push(panel(0.7, y, 11.93, 1.75));
+  pRe.push(box({ text: label, x: 1.15, y: y + 0.3, w: 3.7, fs: 20, bold: true, ff: DISP }));
+  pRe.push(box({ text: ctx, x: 1.15, y: y + 0.86, w: 3.95, fs: 12, color: '#C2C2C8', lh: 1.2 }));
+  pRe.push(box({ text: `${before}<span style="color:${PINK}">     →     </span><span style="color:${PINK2}">${after}</span>`, x: 5.1, y: y + 0.45, w: 5.2, h: 0.85, fs: 32, bold: true, ff: DISP, color: MUTE, align: 'center', valign: 'middle' }));
+  pRe.push(box({ text: note, x: 10.1, y: y + 0.45, w: 2.0, h: 0.85, fs: 13, bold: true, align: 'right', valign: 'middle' }));
 });
-pRe.push(box({ text: 'Dec $50k   →   Jan $82k   →   Feb $85k   →   Mar $101k', x: reX, y: 5.08, w: 4 * reW + 3 * reG, fs: 14.5, bold: true, color: PINK2, align: 'center' }));
-pRe.push(box({ text: 'Individual results; not a guarantee.', x: reX, y: 5.6, w: 4 * reW + 3 * reG, fs: 10.5, italic: true, color: MUTE, align: 'center' }));
+pRe.push(box({ text: 'Individual results; not a guarantee.', x: 0.7, y: 6.25, w: 11.93, fs: 10.5, italic: true, color: MUTE, align: 'center' }));
 pRe.push(footer(8));
 slide('bg-content.png', pRe);
 
@@ -215,7 +217,8 @@ const team = [['Account Managers', 'Own the strategy and day-to-day for each cre
 ['Marketing & Traffic', 'Paid promo, shoutouts and funnels.'],
 ['Data Analysts', 'Track performance and optimize revenue.']];
 const tmW = 3.85, tmGx = 0.35, tmH = 1.6, tmGy = 0.3, tmX = (13.333 - (3 * tmW + 2 * tmGx)) / 2;
-let pTm = [kick('THE TEAM', 0.7, 0.55), title('Behind the scenes', 0.9)];
+let pTm = [kick('THE TEAM', 0.7, 0.55), title('Behind the scenes', 0.9),
+  box({ text: '150+ specialists across the USA, Dubai, Poland and Cyprus.', x: 0.72, y: 1.75, w: 11, fs: 13, italic: true, color: MUTE })];
 team.forEach(([h, d], i) => {
   const col = i % 3, row = Math.floor(i / 3), x = tmX + col * (tmW + tmGx), y = 2.15 + row * (tmH + tmGy);
   pTm.push(panel(x, y, tmW, tmH));
@@ -245,12 +248,12 @@ pPa.push(footer(11));
 slide('bg-content.png', pPa);
 
 // 7 why
-const why = [['Dedicated manager', 'A personal manager and onboarding for every client.'],
-['24/7 support', 'A support team available around the clock.'],
-['Data-driven', 'Decisions based on analytics and performance metrics.'],
-['Creative freedom', 'You create the content — we run the business.'],
-['All levels welcome', 'We work with creators at any level, from start to top.'],
-['Global reach', 'Models and influencers worldwide, men and women.']];
+const why = [['Personalized approach', 'A tailored strategy and dedicated manager for every creator.'],
+['Expert marketing', 'Viral content across a 50M+ follower network.'],
+['Extensive support', 'A full team on your account, available 24/7.'],
+['Lucrative earnings', 'Revenue and profit maximization, done for you.'],
+['Collaborations', 'Cross-promotion across our worldwide talent pool.'],
+['Global reach', 'Offices in the USA, Dubai, Poland & Cyprus.']];
 const wW = 3.85, wGx = 0.35, wH = 1.5, wGy = 0.3, wX = (13.333 - (3 * wW + 2 * wGx)) / 2;
 let p7 = [kick('WHY AS TALENT', 0.7, 0.55), title('Why AS Talent', 0.9)];
 why.forEach(([h, d], i) => {
@@ -264,13 +267,38 @@ why.forEach(([h, d], i) => {
 p7.push(footer(12));
 slide('bg-content.png', p7);
 
-// 8 contact
+// CONTENT HOUSES (13)
+const houses = [['p-house-coast.png', 'Coastal villa', 'Infinity pool · sea views'],
+['p-house-snow.png', 'Alpine set', 'On-location editorial'],
+['p-house-villa.png', 'Poolside villa', 'Full production crew'],
+['p-house-pool.png', 'Group shoots', 'Multi-creator sets']];
+const hoW = 2.86, hoGap = 0.3, hoH = 3.27, hoX = (13.333 - (4 * hoW + 3 * hoGap)) / 2;
+let pHo = [kick('CONTENT HOUSES', 0.7, 0.55), title('Inside our content houses', 0.9),
+  box({ text: 'From coastal villas to alpine sets — real production locations, shot by our in-house crew.', x: 0.72, y: 1.72, w: 11.6, fs: 13, italic: true, color: MUTE })];
+houses.forEach(([im2, name, cap], i) => {
+  const x = hoX + i * (hoW + hoGap), y = 2.3;
+  pHo.push(img({ src: im2, x, y, w: hoW, h: hoH, r: 0.14 }));
+  pHo.push(rect({ x, y, w: hoW, h: hoH, r: 0.14, border: '1px solid rgba(255,46,141,.55)' }));
+  pHo.push(box({ text: name, x: x + 0.2, y: y + hoH - 0.7, w: hoW - 0.4, h: 0.4, fs: 17, bold: true, ff: DISP, valign: 'bottom' }));
+  pHo.push(box({ text: cap.toUpperCase(), x: x + 0.2, y: y + hoH - 0.32, w: hoW - 0.4, fs: 8.5, bold: true, color: PINK2, cs: 1 }));
+});
+pHo.push(footer(13));
+slide('bg-content.png', pHo);
+
+// CONTACT (14)
+let cPills = [];
+[['Telegram', '@AS_Agency'], ['WhatsApp', '+1 (646) 596 6014'], ['Instagram', '@as.talentagency']].forEach((c, i) => {
+  const x = 0.9 + i * (3.63 + 0.35), y = 5.15;
+  cPills.push(panel(x, y, 3.63, 0.98));
+  cPills.push(box({ text: c[0].toUpperCase(), x: x + 0.3, y: y + 0.17, w: 3.63 - 0.6, fs: 9.5, bold: true, color: MUTE, cs: 1.5 }));
+  cPills.push(box({ text: c[1], x: x + 0.3, y: y + 0.44, w: 3.63 - 0.6, fs: 15, bold: true, color: PINK2 }));
+});
 slide('bg-contact.png', [
   kick("LET'S TALK", 0.9, 1.9),
   box({ text: 'Unlock your true<br>potential.', x: 0.85, y: 2.3, w: 9, fs: 56, bold: true, ff: DISP, lh: 1.0 }),
-  box({ text: 'Join AS Talent Agency and unlock your true potential with us.', x: 0.9, y: 4.35, w: 8.4, fs: 17, color: TEXT }),
-  panel(0.9, 5.25, 3.9, 0.9),
-  box({ text: 'astalentagency.com', x: 0.9, y: 5.25, w: 3.9, h: 0.9, fs: 15, bold: true, align: 'center', valign: 'middle' }),
+  box({ text: 'Join AS Talent Agency and grow with a team that lives on your results.', x: 0.9, y: 4.3, w: 8.4, fs: 17, color: TEXT }),
+  ...cPills,
+  box({ text: 'astalentagency.com     ·     AS@ADSTARS.CLUB', x: 0.9, y: 6.5, w: 11, fs: 13, bold: true }),
 ]);
 
 const html = `<!doctype html><html><head><meta charset="utf-8"><style>
