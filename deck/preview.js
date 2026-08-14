@@ -171,11 +171,11 @@ p5.push(footer(7));
 slide('bg-content.png', p5);
 
 // RESULTS
-const res = [['Active paying fans', '1,200', 'from 350'], ['Monthly revenue', '$18k', 'from $4k'],
-['Avg revenue / fan', '$15', 'subs + PPV + tips'], ['Chat response', '<2 min', '24/7 coverage']];
+const res = [['Monthly revenue', '$101k', 'from $50k'], ['Revenue growth', '2×', 'in 3 months'],
+['Extra / month', '+$51k', 'net uplift'], ['Chat response', '<2 min', '24/7 coverage']];
 const reW = 2.86, reG = 0.3, reX = (13.333 - (4 * reW + 3 * reG)) / 2;
 let pRe = [kick('RESULTS', 0.7, 0.55), title('What growth looks like', 0.9),
-  box({ text: 'Representative first-quarter trajectory', x: 0.72, y: 1.75, w: 8, fs: 13, italic: true, color: MUTE })];
+  box({ text: "One creator's first months with AS — before vs. after", x: 0.72, y: 1.75, w: 9, fs: 13, italic: true, color: MUTE })];
 res.forEach(([lab, big, sub], i) => {
   const x = reX + i * (reW + reG), y = 2.35;
   pRe.push(panel(x, y, reW, 2.45));
@@ -183,7 +183,8 @@ res.forEach(([lab, big, sub], i) => {
   pRe.push(box({ text: big, x, y: y + 0.78, w: reW, fs: 44, bold: true, color: PINK2, align: 'center', ff: DISP }));
   pRe.push(box({ text: sub, x, y: y + 1.82, w: reW, fs: 12, color: '#C2C2C8', align: 'center' }));
 });
-pRe.push(box({ text: 'Representative example based on typical outcomes — actual results vary by creator and niche.', x: reX, y: 5.1, w: 4 * reW + 3 * reG, fs: 11.5, italic: true, color: MUTE, align: 'center' }));
+pRe.push(box({ text: 'Dec $50k   →   Jan $82k   →   Feb $85k   →   Mar $101k', x: reX, y: 5.08, w: 4 * reW + 3 * reG, fs: 14.5, bold: true, color: PINK2, align: 'center' }));
+pRe.push(box({ text: 'Individual results; not a guarantee.', x: reX, y: 5.6, w: 4 * reW + 3 * reG, fs: 10.5, italic: true, color: MUTE, align: 'center' }));
 pRe.push(footer(8));
 slide('bg-content.png', pRe);
 

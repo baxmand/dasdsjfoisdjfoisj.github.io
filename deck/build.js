@@ -245,11 +245,11 @@ s = p.addSlide();
 s.background = { path: A + 'bg-content.png' };
 kicker(s, 'RESULTS', 0.7, 0.55);
 title(s, 'What growth looks like', 0.9);
-s.addText('Representative first-quarter trajectory', { x: 0.72, y: 1.75, w: 8, h: 0.35, fontFace: SANS, fontSize: 13, italic: true, color: MUTE });
+s.addText("One creator's first months with AS — before vs. after", { x: 0.72, y: 1.75, w: 9, h: 0.35, fontFace: SANS, fontSize: 13, italic: true, color: MUTE });
 const res = [
-  ['Active paying fans', '1,200', 'from 350'],
-  ['Monthly revenue', '$18k', 'from $4k'],
-  ['Avg revenue / fan', '$15', 'subs + PPV + tips'],
+  ['Monthly revenue', '$101k', 'from $50k'],
+  ['Revenue growth', '2×', 'in 3 months'],
+  ['Extra / month', '+$51k', 'net uplift'],
   ['Chat response', '<2 min', '24/7 coverage'],
 ];
 const reW = 2.86, reG = 0.3;
@@ -261,8 +261,10 @@ res.forEach(([lab, big, sub], i) => {
   s.addText(big, { x, y: y + 0.78, w: reW, h: 0.9, fontFace: DISP, fontSize: 44, bold: true, color: PINK2, align: 'center' });
   s.addText(sub, { x, y: y + 1.82, w: reW, h: 0.35, fontFace: SANS, fontSize: 12, color: 'C2C2C8', align: 'center' });
 });
-s.addText('Representative example based on typical outcomes — actual results vary by creator and niche.',
-  { x: reX, y: 5.1, w: 4 * reW + 3 * reG, h: 0.4, fontFace: SANS, fontSize: 11.5, italic: true, color: MUTE, align: 'center' });
+s.addText('Dec $50k   →   Jan $82k   →   Feb $85k   →   Mar $101k',
+  { x: reX, y: 5.08, w: 4 * reW + 3 * reG, h: 0.4, fontFace: SANS, fontSize: 14.5, bold: true, color: PINK2, align: 'center' });
+s.addText('Individual results; not a guarantee.',
+  { x: reX, y: 5.6, w: 4 * reW + 3 * reG, h: 0.3, fontFace: SANS, fontSize: 10.5, italic: true, color: MUTE, align: 'center' });
 footer(s, 8);
 s.addNotes('Representative growth example. Replace with real client numbers where available.');
 
